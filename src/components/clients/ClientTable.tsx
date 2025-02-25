@@ -48,6 +48,37 @@ const ClientTable = ({ onEdit }: ClientTableProps) => {
       billingFax: "+1 234 567 8905",
       billingEmail: "finance@techsolutions.com"
     },
+    {
+      id: 2,
+      companyName: "TCS Solutions Inc",
+      contactPerson: "Rajesh",
+      email: "rajesh@techsolutions.com",
+      phone: "+1 234 567 8900",
+      status: "Active",
+      clientType: "corporate",
+      panNumber: "ABCDE1234F",
+      isActive: true,
+      mailingCountry: "USA",
+      mailingStreet: "123 Tech Street",
+      mailingCity: "San Francisco",
+      mailingState: "California",
+      mailingZipCode: "94105",
+      mailingPhone: "+1 234 567 8900",
+      mailingMobile: "+1 234 567 8901",
+      mailingFax: "+1 234 567 8902",
+      mailingEmail: "john@techsolutions.com",
+      sameAsMailing: false,
+      billingAttention: "Finance Department",
+      billingCountry: "USA",
+      billingStreet: "456 Finance Street",
+      billingCity: "San Francisco",
+      billingState: "California",
+      billingZipCode: "94106",
+      billingPhone: "+1 234 567 8903",
+      billingMobile: "+1 234 567 8904",
+      billingFax: "+1 234 567 8905",
+      billingEmail: "finance@techsolutions.com"
+    },
   ];
 
   return (

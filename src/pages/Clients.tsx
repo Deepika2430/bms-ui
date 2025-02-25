@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -6,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import ClientForm from "@/components/clients/ClientForm";
 import ClientTable from "@/components/clients/ClientTable";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Clients = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -35,25 +35,30 @@ const Clients = () => {
   };
 
   return (
-    <div className="min-h-screen pt-32 px-4">
+    <div className="min-h-screen pt-32 px-4 bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-4xl font-bold text-nav-foreground">Clients</h1>
-          <Button 
-            onClick={() => setIsDialogOpen(true)}
-            className="bg-nav-accent hover:bg-nav-accent/90"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Client
-          </Button>
-        </div>
-
-        <ClientTable onEdit={handleEdit} />
+        <Card className="shadow-lg">
+          <CardHeader className="bg-nav-accent text-white">
+            <CardTitle className="flex justify-between items-center">
+              <span>Clients</span>
+              <Button 
+                onClick={() => setIsDialogOpen(true)}
+                className="bg-white text-nav-accent hover:bg-gray-100"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Client
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ClientTable onEdit={handleEdit} />
+          </CardContent>
+        </Card>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogTitle>
-              {editingClient ? "Edit Client" : "Create Client"}
+              {/* {editingClient ? "Edit Client" : "Create Client"} */}
             </DialogTitle>
             <ClientForm 
               initialData={editingClient}
