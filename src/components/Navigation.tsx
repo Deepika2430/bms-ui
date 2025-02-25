@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home, Briefcase, Users, ClipboardList } from "lucide-react";
 
 interface NavLink {
   path: string;
   label: string;
+  icon: JSX.Element;
 }
 
 const links: NavLink[] = [
-  { path: "/", label: "Home" },
-  { path: "/projects", label: "Projects" },
-  { path: "/clients", label: "Clients" },
-  { path: "/tasks", label: "Tasks" },
+  { path: "/", label: "Home", icon: <Home className="mr-2 h-4 w-4" /> },
+  { path: "/projects", label: "Projects", icon: <Briefcase className="mr-2 h-4 w-4" /> },
+  { path: "/clients", label: "Clients", icon: <Users className="mr-2 h-4 w-4" /> },
+  { path: "/tasks", label: "Tasks", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
 ];
 
 const Navigation = () => {
@@ -40,14 +41,16 @@ const Navigation = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "shadow-md bg-white" : "bg-transparent"
+        scrolled ? "shadow-md bg-gradient-to-r from-blue-600 to-indigo-600" : "bg-gradient-to-r from-blue-800 to-indigo-800"
       }`}
     >
       <nav className="relative bg-nav/95 backdrop-blur-nav border-b border-gray-200/20 animate-nav-in">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo placeholder */}
-            <div className="flex-shrink-0 w-10 h-10 bg-nav-accent/10 rounded-md align-middle"><img src="htt://tecnics.com/wp-content/uploads/2020/03/logo1.png" alt="Logo" className="align-middle object-contain" /></div>
+            <div className="flex-shrink-0 w-10 h-10 bg-nav-accent/10 rounded-md align-middle">
+              <img src="https://tecnics.com/wp-content/uploads/2020/03/logo1.png" alt="Logo" className="align-middle object-contain" />
+            </div>
 
             {/* Desktop navigation */}
             <div className="hidden md:flex items-center space-x-8">
@@ -55,19 +58,20 @@ const Navigation = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`relative text-nav-foreground text-sm font-medium transition-colors hover:text-nav-accent
-                    ${location.pathname === link.path ? "text-nav-accent" : ""}
+                  className={`relative flex items-center text-gray-500 text-sm font-medium transition-colors hover:text-gray-900
+                    ${location.pathname === link.path ? "text-gray-900 font-semibold" : ""}
                     group`}
                 >
+                  {link.icon}
                   {link.label}
-                  <span className="absolute bottom-0 left-0 h-0.5 bg-nav-accent transform origin-left scale-x-0 transition-transform group-hover:scale-x-100"></span>
+                  <span className="absolute bottom-0 left-0 h-0.5 bg-gray-300 transform origin-left scale-x-0 transition-transform group-hover:scale-x-100"></span>
                 </Link>
               ))}
             </div>
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden rounded-md p-2 text-nav-foreground hover:bg-nav-accent/10 transition-colors"
+              className="md:hidden rounded-md p-2 text-white hover:bg-gray-300/10 transition-colors"
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? <X size={20} /> : <Menu size={20} />}
@@ -75,19 +79,19 @@ const Navigation = () => {
           </div>
 
           {/* Breadcrumbs */}
-          <div className="py-2 text-sm">
-            <Link to="/" className="text-nav-muted hover:text-nav-accent transition-colors">
+          <div className="py-2 text-sm ">
+            <Link to="/" className={`hover:text-blue-900 transition-colors ${breadcrumbs.length === 0 ? "font-semibold" : "text-red-500"}`}>
               Home
             </Link>
             {breadcrumbs.map((crumb, index) => (
-              <span key={crumb.path}>
-                <span className="mx-2 text-nav-muted">/</span>
+              <span className="text-gray-900" key={crumb.path}>
+                <span className="mx-2">/</span>
                 <Link
                   to={crumb.path}
                   className={`${
                     index === breadcrumbs.length - 1
-                      ? "text-nav-accent"
-                      : "text-nav-muted hover:text-nav-accent"
+                      ? "text-gray-900 font-semibold"
+                      : "hover:text-gray-900"
                   } transition-colors`}
                 >
                   {crumb.label}
@@ -111,12 +115,15 @@ const Navigation = () => {
                 className={`block px-3 py-2 rounded-md text-base font-medium transition-colors
                   ${
                     location.pathname === link.path
-                      ? "text-nav-accent bg-nav-accent/10"
-                      : "text-nav-foreground hover:text-nav-accent hover:bg-nav-accent/5"
+                      ? "bg-gray-700 text-white"
+                      : "text-white hover:text-gray-300 hover:bg-gray-300/5"
                   }`}
                 onClick={() => setIsOpen(false)}
               >
-                {link.label}
+                <div className="flex items-center">
+                  {link.icon}
+                  {link.label}
+                </div>
               </Link>
             ))}
           </div>
