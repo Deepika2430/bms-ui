@@ -32,6 +32,17 @@ const ProjectTable = ({ onEdit }: ProjectTableProps) => {
       department: "Engineering",
       consultant: "John Doe",
     },
+    {
+      id: 2,
+      projectCode: "PRJ002",
+      projectName: "Website BMS",
+      client: "TCS Solutions Inc",
+      startDate: "2024-03-01",
+      endDate: "2024-06-30",
+      status: "Active",
+      department: "Engineering",
+      consultant: "John Doe",
+    },
   ];
 
   const filteredProjects = projects.filter((project) =>
@@ -43,7 +54,7 @@ const ProjectTable = ({ onEdit }: ProjectTableProps) => {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pt-4">
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
