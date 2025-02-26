@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Home, Briefcase, Users, ClipboardList } from "lucide-react";
+import { Menu, X, ChevronRight, Home, FolderKanban, Users, CheckSquare, Settings, FileText } from "lucide-react";
 
 interface NavLink {
   path: string;
   label: string;
-  icon: JSX.Element;
+  icon: React.ElementType;
 }
 
 const links: NavLink[] = [
-  { path: "/", label: "Home", icon: <Home className="mr-2 h-4 w-4" /> },
-  { path: "/projects", label: "Projects", icon: <Briefcase className="mr-2 h-4 w-4" /> },
-  { path: "/clients", label: "Clients", icon: <Users className="mr-2 h-4 w-4" /> },
-  { path: "/tasks", label: "Tasks", icon: <ClipboardList className="mr-2 h-4 w-4" /> },
+  { path: "/home", label: "Home", icon: Home },
+  { path: "/projects", label: "Projects", icon: FolderKanban },
+  { path: "/clients", label: "Clients", icon: Users },
+  { path: "/tasks", label: "Tasks", icon: CheckSquare },
+  { path: "/reports", label: "Reports", icon: FileText },
+  { path: "/settings", label: "Settings", icon: Settings },
 ];
 
 const Navigation = () => {
@@ -41,37 +43,51 @@ const Navigation = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "shadow-md bg-gradient-to-r from-blue-600 to-indigo-600" : "bg-gradient-to-r from-blue-800 to-indigo-800"
+        scrolled ? "shadow-lg" : ""
       }`}
     >
-      <nav className="relative bg-nav/95 backdrop-blur-nav border-b border-gray-200/20 animate-nav-in">
+      <nav className="relative bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo placeholder */}
-            <div className="flex-shrink-0 w-10 h-10 bg-nav-accent/10 rounded-md align-middle">
-              <img src="https://tecnics.com/wp-content/uploads/2020/03/logo1.png" alt="Logo" className="align-middle object-contain" />
+            {/* Logo and brand */}
+            <div className="flex items-center">
+              <Link to="/" className="flex items-center">
+                <div className="flex-shrink-0 w-12 h-8 bg-nav-accent rounded-lg flex items-center justify-center">
+                  {/* <span className="text-white font-bold text-xl">BMS</span> */}
+                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYR9OQLjpoVN2lnE14Lx20UtUKZ-V2gbcGYw&s" alt="BMS" className=" object-contain object-fill" />
+                </div>
+                <span className="ml-3 text-lg font-semibold text-gray-900 dark:text-white">
+                  {/* Business Management System */}  
+                </span>
+              </Link>
             </div>
 
             {/* Desktop navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {links.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`relative flex items-center text-gray-500 text-sm font-medium transition-colors hover:text-gray-900
-                    ${location.pathname === link.path ? "text-gray-900 font-semibold" : ""}
-                    group`}
-                >
-                  {link.icon}
-                  {link.label}
-                  <span className="absolute bottom-0 left-0 h-0.5 bg-gray-300 transform origin-left scale-x-0 transition-transform group-hover:scale-x-100"></span>
-                </Link>
-              ))}
+            <div className="hidden md:flex items-center space-x-1">
+              {links.map((link) => {
+                const isActive = location.pathname === link.path;
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2
+                      ${
+                        isActive
+                          ? "bg-nav-accent/10 text-nav-accent"
+                          : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{link.label}</span>
+                  </Link>
+                );
+              })}
             </div>
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden rounded-md p-2 text-white hover:bg-gray-300/10 transition-colors"
+              className="md:hidden rounded-lg p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? <X size={20} /> : <Menu size={20} />}
@@ -79,24 +95,27 @@ const Navigation = () => {
           </div>
 
           {/* Breadcrumbs */}
-          <div className="py-2 text-sm ">
-            <Link to="/" className={`hover:text-blue-900 transition-colors ${breadcrumbs.length === 0 ? "font-semibold" : "text-red-500"}`}>
-              Home
+          <div className="py-2 text-sm flex items-center text-gray-500 dark:text-gray-400">
+            <Link 
+              to="/home" 
+              className="flex items-center hover:text-nav-accent transition-colors"
+            >
+              <Home className="h-4 w-4" />
             </Link>
             {breadcrumbs.map((crumb, index) => (
-              <span className="text-gray-900" key={crumb.path}>
-                <span className="mx-2">/</span>
+              <div key={crumb.path} className="flex items-center">
+                <ChevronRight className="h-4 w-4 mx-2 text-gray-400" />
                 <Link
                   to={crumb.path}
-                  className={`${
+                  className={`hover:text-nav-accent transition-colors ${
                     index === breadcrumbs.length - 1
-                      ? "text-gray-900 font-semibold"
-                      : "hover:text-gray-900"
-                  } transition-colors`}
+                      ? "text-nav-accent font-medium"
+                      : ""
+                  }`}
                 >
                   {crumb.label}
                 </Link>
-              </span>
+              </div>
             ))}
           </div>
         </div>
@@ -104,28 +123,30 @@ const Navigation = () => {
         {/* Mobile menu */}
         <div
           className={`md:hidden transition-all duration-300 ease-in-out ${
-            isOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0 invisible"
+            isOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0 invisible"
           }`}
         >
-          <div className="px-4 pt-2 pb-3 space-y-1 bg-nav/95 backdrop-blur-nav border-t border-gray-200/20">
-            {links.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors
-                  ${
-                    location.pathname === link.path
-                      ? "bg-gray-700 text-white"
-                      : "text-white hover:text-gray-300 hover:bg-gray-300/5"
-                  }`}
-                onClick={() => setIsOpen(false)}
-              >
-                <div className="flex items-center">
-                  {link.icon}
-                  {link.label}
-                </div>
-              </Link>
-            ))}
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+            {links.map((link) => {
+              const isActive = location.pathname === link.path;
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-base font-medium transition-colors
+                    ${
+                      isActive
+                        ? "bg-nav-accent/10 text-nav-accent"
+                        : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{link.label}</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </nav>
