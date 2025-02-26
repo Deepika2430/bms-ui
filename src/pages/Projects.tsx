@@ -58,9 +58,9 @@ const Projects = () => {
           </CardContent>
         </Card>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogTitle>
-              {/* {editingProject ? "Edit Project" : "Create Project"} */}
+          <DialogContent className="max-w-4xl max-h-full overflow-y-auto">
+            <DialogTitle className="pl-2">
+              {editingProject ? "Edit Project" : "Create Project"}
             </DialogTitle>
             <ProjectForm
               initialData={editingProject}
