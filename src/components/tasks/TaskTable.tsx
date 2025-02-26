@@ -47,7 +47,7 @@ const TaskTable = ({ tasks, onCreateTask, onEditTask }: TaskTableProps) => {
             placeholder="Search tasks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8"
+            className="pl-8 pl-8 h-10 w-full"
           />
         </div>
       </div>
