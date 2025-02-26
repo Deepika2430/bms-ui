@@ -7,6 +7,8 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
+import { toast as originalToast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export function Toaster() {
   const { toasts } = useToast()
@@ -31,3 +33,5 @@ export function Toaster() {
     </ToastProvider>
   )
 }
+
+export const toast = originalToast;
