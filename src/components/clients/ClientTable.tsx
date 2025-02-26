@@ -82,7 +82,7 @@ const ClientTable = ({ onEdit }: ClientTableProps) => {
   ];
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border ">
       <Table>
         <TableHeader>
           <TableRow>
