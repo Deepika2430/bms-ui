@@ -52,7 +52,7 @@ const Tasks = () => {
   };
 
   return (
-    <div className="min-h-screen pt-32 px-4 bg-gray-50">
+    <div className="min-h-screen pt-32 px-4 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         <Card className="shadow-lg">
           <CardHeader className="bg-nav-accent text-white">

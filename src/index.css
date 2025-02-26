@@ -99,3 +99,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+:root {
+  --tooltip-bg: #ffffff;
+  --tooltip-text: #000000;
+  --tooltip-border: #e2e8f0;
+}
+
+.dark {
+  --tooltip-bg: #1e293b; /* Tailwind gray-800 */
+  --tooltip-text: #ffffff;
+  --tooltip-border: #64748b; /* Tailwind gray-500 */
+}

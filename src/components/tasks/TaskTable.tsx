@@ -52,7 +52,7 @@ const TaskTable = ({ tasks, onCreateTask, onEditTask }: TaskTableProps) => {
         </div>
       </div>
 
-      <div className="rounded-md border bg-white shadow-sm">
+      <div className="rounded-md border bg-white dark:bg-gray-900 shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>

@@ -25,9 +25,9 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen pt-32 px-4 bg-gray-50">
+    <div className="min-h-screen pt-32 px-4 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-nav-foreground mb-6">Settings</h1>
+        <h1 className="text-4xl font-bold text-nav-foreground dark:text-white m mb-6">Settings</h1>
         <div className="flex space-x-4 mb-6">
           <Button
             variant={activeTab === "manage-users" ? "default" : "outline"}
