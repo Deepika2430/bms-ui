@@ -45,7 +45,7 @@ const Projects = () => {
             <CardTitle className="flex justify-between items-center">
               <span>Projects</span>
               <Button
-                onClick={() => setIsDialogOpen(true)}
+                onClick={() => {setIsDialogOpen(true); setEditingProject(null);}}
                 className="bg-white text-nav-accent hover:bg-gray-100"
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -58,8 +58,8 @@ const Projects = () => {
           </CardContent>
         </Card>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-full overflow-y-auto">
-            <DialogTitle className="pl-2">
+          <DialogContent className="max-w-4xl max-h-full overflow-y-auto px-0 pb-0 ">
+            <DialogTitle className="pl-6 pb-0">
               {editingProject ? "Edit Project" : "Create Project"}
             </DialogTitle>
             <ProjectForm

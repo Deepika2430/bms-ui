@@ -135,21 +135,21 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-none border-none p-0">
       <CardContent>
-        <Form {...form}>
+        <Form {...form} >
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <div className="border rounded-lg shadow-md">
                 <div
-                  className="flex justify-between items-center p-4 cursor-pointer"
+                  className={`flex justify-between items-center cursor-pointer ${isProjectInfoOpen ? "pb-0 px-3 pt-3" : "p-3" } `}
                   onClick={() => setIsProjectInfoOpen(!isProjectInfoOpen)}
                 >
-                  <h2 className="text-lg font-semibold">Project Information</h2>
+                  <h3 className="text-lg font-semibold p-0">Project Information</h3>
                   {isProjectInfoOpen ? <ChevronUp /> : <ChevronDown />}
                 </div>
                 {isProjectInfoOpen && (
                   <div className="p-4 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                       <FormField
                         control={form.control}
                         name="clientId"
@@ -704,7 +704,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
               </div>
               <div className="border rounded-lg shadow-md">
                 <div
-                  className="flex justify-between items-center p-4 cursor-pointer"
+                  className={`flex justify-between items-center cursor-pointer ${isAssignPmOpen ? "pb-0 px-3 pt-3" : "p-3" } `}
                   onClick={() => setIsAssignPmOpen(!isAssignPmOpen)}
                 >
                   <h2 className="text-lg font-semibold">Assign PM</h2>
@@ -712,7 +712,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                 </div>
                 {isAssignPmOpen && (
                   <div className="p-4 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                       <FormField
                         control={form.control}
                         name="departmentId"
@@ -775,7 +775,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                       <h4 className="text-md font-medium mb-4">
                         Primary Contact
                       </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                         <FormField
                           control={form.control}
                           name="firstName"
