@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { createClient, updateClient } from "@/services/clientService";
 
 const clientSchema = z.object({
   // Client Information
@@ -60,9 +61,11 @@ interface ClientFormProps {
   onSubmit: (data: z.infer<typeof clientSchema>) => void;
   onCancel: () => void;
   initialData?: any;
+  clientData?: any;
+  isViewMode?: boolean;
 }
 
-const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
+const ClientForm = ({ onSubmit, onCancel, initialData, clientData, isViewMode = false }: ClientFormProps) => {
   const form = useForm<z.infer<typeof clientSchema>>({
     resolver: zodResolver(clientSchema),
     defaultValues: {
@@ -126,11 +129,26 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
     }
   }, [sameAsMailing, mailingAddress, form]);
 
+  useEffect(() => {
+    if (clientData) {
+      form.reset(clientData);
+    }
+  }, [clientData, form]);
+
+  const handleSubmit = async (data: z.infer<typeof clientSchema>) => {
+    if (initialData) {
+      await updateClient(initialData.id, data);
+    } else {
+      await createClient(data);
+    }
+    onSubmit(data);
+  };
+
   return (
     <Card className="border-none shadow-none p-0">
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
             <div className="border rounded-lg shadow-md">
               <div
                 className={`flex justify-between items-center cursor-pointer ${isClientInfoOpen ? "pb-0 px-3 pt-3" : "p-3"}`}
@@ -149,7 +167,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Company Name*</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -162,7 +180,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Client Type*</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isViewMode}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select Client Type..." />
@@ -186,7 +204,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>PAN/Federal Tax ID*</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -203,6 +221,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              disabled={isViewMode}
                             />
                           </FormControl>
                           <FormLabel>Is Active</FormLabel>
@@ -233,7 +252,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Contact Person*</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -247,7 +266,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Country*</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -261,7 +280,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Street*</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -275,7 +294,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>City*</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -289,7 +308,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>State*</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -303,7 +322,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Zip Code*</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -317,7 +336,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Phone (Office)</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -331,7 +350,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Phone (Mobile)</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -345,7 +364,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Fax</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -359,7 +378,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Email*</FormLabel>
                           <FormControl>
-                            <Input {...field} type="email" />
+                            <Input {...field} type="email" disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -389,6 +408,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            disabled={isViewMode}
                           />
                         </FormControl>
                         <FormLabel>Same as Mailing Address</FormLabel>
@@ -405,7 +425,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Attention</FormLabel>
                           <FormControl>
-                            <Input {...field} disabled={sameAsMailing} />
+                            <Input {...field} disabled={sameAsMailing || isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -419,7 +439,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Country</FormLabel>
                           <FormControl>
-                            <Input {...field} disabled={sameAsMailing} />
+                            <Input {...field} disabled={sameAsMailing || isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -433,7 +453,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Street</FormLabel>
                           <FormControl>
-                            <Input {...field} disabled={sameAsMailing} />
+                            <Input {...field} disabled={sameAsMailing || isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -447,7 +467,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>City</FormLabel>
                           <FormControl>
-                            <Input {...field} disabled={sameAsMailing} />
+                            <Input {...field} disabled={sameAsMailing || isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -461,7 +481,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>State</FormLabel>
                           <FormControl>
-                            <Input {...field} disabled={sameAsMailing} />
+                            <Input {...field} disabled={sameAsMailing || isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -475,7 +495,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Zip Code</FormLabel>
                           <FormControl>
-                            <Input {...field} disabled={sameAsMailing} />
+                            <Input {...field} disabled={sameAsMailing || isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -489,7 +509,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Phone (Office)</FormLabel>
                           <FormControl>
-                            <Input {...field} disabled={sameAsMailing} />
+                            <Input {...field} disabled={sameAsMailing || isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -503,7 +523,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Phone (Mobile)</FormLabel>
                           <FormControl>
-                            <Input {...field} disabled={sameAsMailing} />
+                            <Input {...field} disabled={sameAsMailing || isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -517,7 +537,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Fax</FormLabel>
                           <FormControl>
-                            <Input {...field} disabled={sameAsMailing} />
+                            <Input {...field} disabled={sameAsMailing || isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -531,7 +551,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input {...field} type="email" disabled={sameAsMailing} />
+                            <Input {...field} type="email" disabled={sameAsMailing || isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -542,14 +562,16 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
               )}
             </div>
 
-            <div className="flex justify-end space-x-4">
-              <Button type="button" variant="outline" onClick={onCancel}>
-                Cancel
-              </Button>
-              <Button type="submit" className="bg-nav-accent text-white">
-                {initialData ? "Update Client" : "Save Client"}
-              </Button>
-            </div>
+            {!isViewMode && (
+              <div className="flex justify-end space-x-4">
+                <Button type="button" variant="outline" onClick={onCancel}>
+                  Cancel
+                </Button>
+                <Button type="submit" className="bg-nav-accent text-white">
+                  {initialData ? "Update Client" : "Save Client"}
+                </Button>
+              </div>
+            )}
           </form>
         </Form>
       </CardContent>

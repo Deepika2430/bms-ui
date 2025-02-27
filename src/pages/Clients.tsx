@@ -10,14 +10,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const Clients = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<any>(null);
+  const [viewingClient, setViewingClient] = useState<any>(null);
   const { toast } = useToast();
 
   const handleCreateClient = (data: any) => {
     console.log(editingClient ? "Updating client:" : "Creating client:", data);
     toast({
       title: "Success",
-      description: editingClient 
-        ? "Client updated successfully" 
+      description: editingClient
+        ? "Client updated successfully"
         : "Client created successfully",
     });
     setIsDialogOpen(false);
@@ -29,9 +30,15 @@ const Clients = () => {
     setIsDialogOpen(true);
   };
 
+  const handleView = (client: any) => {
+    setViewingClient(client);
+    setIsDialogOpen(true);
+  };
+
   const handleClose = () => {
     setIsDialogOpen(false);
     setEditingClient(null);
+    setViewingClient(null);
   };
 
   return (
@@ -41,8 +48,8 @@ const Clients = () => {
           <CardHeader className="bg-nav-accent text-white">
             <CardTitle className="flex justify-between items-center">
               <span>Clients</span>
-              <Button 
-                onClick={() => {setIsDialogOpen(true) ; setEditingClient(null);}}
+              <Button
+                onClick={() => {setIsDialogOpen(true) ; setEditingClient(null); setViewingClient(null);}}
                 className="bg-white text-nav-accent hover:bg-gray-100"
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -51,19 +58,20 @@ const Clients = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ClientTable onEdit={handleEdit} />
+            <ClientTable onEdit={handleEdit} onView={handleView} />
           </CardContent>
         </Card>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogTitle className="px-6">
-              {editingClient ? "Edit Client" : "Create Client"}
+              {editingClient ? "Edit Client" : viewingClient ? "View Client" : "Create Client"}
             </DialogTitle>
-            <ClientForm 
-              initialData={editingClient}
-              onSubmit={handleCreateClient} 
-              onCancel={handleClose} 
+            <ClientForm
+              initialData={editingClient || viewingClient}
+              onSubmit={handleCreateClient}
+              onCancel={handleClose}
+              isViewMode={!!viewingClient}
             />
           </DialogContent>
         </Dialog>

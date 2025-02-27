@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -8,78 +7,28 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Edit, Eye } from "lucide-react";
+import { getClients } from "@/services/clientService";
 
 interface ClientTableProps {
   onEdit: (client: any) => void;
+  onSelect?: (client: any) => void;
+  onView: (client: any) => void;
 }
 
-const ClientTable = ({ onEdit }: ClientTableProps) => {
-  // Temporary mock data
-  const clients = [
-    {
-      id: 1,
-      companyName: "Tech Solutions Inc",
-      contactPerson: "John Doe",
-      email: "john@techsolutions.com",
-      phone: "+1 234 567 8900",
-      status: "Active",
-      clientType: "corporate",
-      panNumber: "ABCDE1234F",
-      isActive: true,
-      mailingCountry: "USA",
-      mailingStreet: "123 Tech Street",
-      mailingCity: "San Francisco",
-      mailingState: "California",
-      mailingZipCode: "94105",
-      mailingPhone: "+1 234 567 8900",
-      mailingMobile: "+1 234 567 8901",
-      mailingFax: "+1 234 567 8902",
-      mailingEmail: "john@techsolutions.com",
-      sameAsMailing: false,
-      billingAttention: "Finance Department",
-      billingCountry: "USA",
-      billingStreet: "456 Finance Street",
-      billingCity: "San Francisco",
-      billingState: "California",
-      billingZipCode: "94106",
-      billingPhone: "+1 234 567 8903",
-      billingMobile: "+1 234 567 8904",
-      billingFax: "+1 234 567 8905",
-      billingEmail: "finance@techsolutions.com"
-    },
-    {
-      id: 2,
-      companyName: "TCS Solutions Inc",
-      contactPerson: "Rajesh",
-      email: "rajesh@techsolutions.com",
-      phone: "+1 234 567 8900",
-      status: "Active",
-      clientType: "corporate",
-      panNumber: "ABCDE1234F",
-      isActive: true,
-      mailingCountry: "USA",
-      mailingStreet: "123 Tech Street",
-      mailingCity: "San Francisco",
-      mailingState: "California",
-      mailingZipCode: "94105",
-      mailingPhone: "+1 234 567 8900",
-      mailingMobile: "+1 234 567 8901",
-      mailingFax: "+1 234 567 8902",
-      mailingEmail: "john@techsolutions.com",
-      sameAsMailing: false,
-      billingAttention: "Finance Department",
-      billingCountry: "USA",
-      billingStreet: "456 Finance Street",
-      billingCity: "San Francisco",
-      billingState: "California",
-      billingZipCode: "94106",
-      billingPhone: "+1 234 567 8903",
-      billingMobile: "+1 234 567 8904",
-      billingFax: "+1 234 567 8905",
-      billingEmail: "finance@techsolutions.com"
-    },
-  ];
+const ClientTable = ({ onEdit, onSelect = () => {}, onView }: ClientTableProps) => {
+
+  const [clients, setClients ] = useState(null);
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      const response = await getClients();
+      console.log(response.map((client) => console.log(client)));
+      setClients(response);
+    };
+    fetchClients();
+  }, []);
 
   return (
     <div className="rounded-md border ">
@@ -95,15 +44,15 @@ const ClientTable = ({ onEdit }: ClientTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {clients.map((client) => (
-            <TableRow key={client.id}>
-              <TableCell className="font-medium">{client.companyName}</TableCell>
-              <TableCell>{client.contactPerson}</TableCell>
-              <TableCell>{client.email}</TableCell>
-              <TableCell>{client.phone}</TableCell>
-              <TableCell>{client.status}</TableCell>
+          {clients?.map((client) => (
+            <TableRow key={client.id} onClick={() => onView(client)} className="cursor-pointer">
+              <TableCell className="font-medium">{client?.companyName}</TableCell>
+              <TableCell>{client?.contactPerson}</TableCell>
+              <TableCell>{client?.mailingEmail}</TableCell>
+              <TableCell>{client?.mailingPhone}</TableCell>
+              <TableCell>{client?.isActive ? "Active" : "Inactive"}</TableCell>
               <TableCell>
-                <Button variant="ghost" size="icon" onClick={() => onEdit(client)}>
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(client); }}>
                   <Edit className="h-4 w-4" />
                 </Button>
               </TableCell>
