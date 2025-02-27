@@ -7,6 +7,7 @@ import Clients from "../pages/Clients";
 import Tasks from "../pages/Tasks";
 import Settings from "../pages/Settings";
 import BmsHome from "../pages/BmsHome";
+import AuthForm from "../pages/AuthForm";
 import NotFound from "../pages/NotFound";
 import SignOut from "./Signout";
 import { getToken } from "../services/authService";
@@ -41,6 +42,7 @@ const AuthHandler = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<BmsHome />} />
+      <Route path="/login" element={<AuthForm />} />
       <Route path="/signout" element={<SignOut />} />
 
       {/* Protected Routes */}
