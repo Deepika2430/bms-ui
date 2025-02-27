@@ -7,7 +7,7 @@ import Clients from "../pages/Clients";
 import Tasks from "../pages/Tasks";
 import Settings from "../pages/Settings";
 import BmsHome from "../pages/BmsHome";
-import AuthForm from "../pages/AuthForm";
+import AuthForm from "../components/AuthForm";
 import NotFound from "../pages/NotFound";
 import SignOut from "./Signout";
 import { getToken } from "../services/authService";
@@ -21,7 +21,7 @@ const AuthHandler = () => {
       const token = getToken();
       setIsAuthenticated(!!token);
       console.log("Authentication updated:", !!token);
-      
+
       if (token) {
         navigate("/home", { replace: true });
       }
