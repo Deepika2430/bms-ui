@@ -42,6 +42,7 @@ export default function AuthForm({ onClose }) {
         setAuthToken(response.token);
         toast.success("Login Successful!");
       }
+      window.dispatchEvent(new Event("authChange"));
       navigate("/home");
     } catch (err) {
       setError(err.message);

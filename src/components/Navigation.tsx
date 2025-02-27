@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronRight, Home, FolderKanban, Users, CheckSquare, Settings, FileText } from "lucide-react";
+import { Menu, X, ChevronRight, Home, FolderKanban, Users, CheckSquare, Settings, FileText, LogOut } from "lucide-react";
 
 interface NavLink {
   path: string;
@@ -15,6 +15,7 @@ const links: NavLink[] = [
   { path: "/tasks", label: "Tasks", icon: CheckSquare },
   { path: "/reports", label: "Reports", icon: FileText },
   { path: "/settings", label: "Settings", icon: Settings },
+  { path: "/signout", label: "Signout", icon: LogOut}
 ];
 
 const Navigation = () => {
