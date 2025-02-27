@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { register, login, setAuthToken } from "@/services/authService";
 import { toast } from "react-toastify";
+import { getToken } from "@/services/authService";
 
 export default function AuthForm({ onClose }) {
   const [isRegister, setIsRegister] = useState(false);
@@ -51,6 +52,12 @@ export default function AuthForm({ onClose }) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (getToken()) {
+      navigate("/home", { replace: true });
+    }
+  }, []);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
