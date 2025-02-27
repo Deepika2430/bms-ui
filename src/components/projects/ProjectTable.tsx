@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -13,39 +12,15 @@ import { Edit, Search } from "lucide-react";
 import { useState } from "react";
 
 interface ProjectTableProps {
+  projects: any[];
   onEdit: (project: any) => void;
+  onView: (project: any) => void;
 }
 
-const ProjectTable = ({ onEdit }: ProjectTableProps) => {
+const ProjectTable = ({ projects, onEdit, onView }: ProjectTableProps) => {
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Temporary mock data
-  const projects = [
-    {
-      id: 1,
-      projectCode: "PRJ001",
-      projectName: "Website Redesign",
-      client: "Tech Solutions Inc",
-      startDate: "2024-03-01",
-      endDate: "2024-06-30",
-      status: "Active",
-      department: "Engineering",
-      consultant: "John Doe",
-    },
-    {
-      id: 2,
-      projectCode: "PRJ002",
-      projectName: "Website BMS",
-      client: "TCS Solutions Inc",
-      startDate: "2024-03-01",
-      endDate: "2024-06-30",
-      status: "Active",
-      department: "Engineering",
-      consultant: "John Doe",
-    },
-  ];
-
-  const filteredProjects = projects.filter((project) =>
+  const filteredProjects = projects?.filter((project) =>
     Object.values(project).some(
       (value) =>
         value &&
@@ -77,24 +52,20 @@ const ProjectTable = ({ onEdit }: ProjectTableProps) => {
               <TableHead>Start Date</TableHead>
               <TableHead>End Date</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead>Consultant</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredProjects.map((project) => (
-              <TableRow key={project.id}>
+            {filteredProjects?.map((project) => (
+              <TableRow key={project.id} onClick={() => onView(project)} className="cursor-pointer">
                 <TableCell className="font-medium">{project.projectCode}</TableCell>
                 <TableCell>{project.projectName}</TableCell>
                 <TableCell>{project.client}</TableCell>
                 <TableCell>{project.startDate}</TableCell>
                 <TableCell>{project.endDate}</TableCell>
                 <TableCell>{project.status}</TableCell>
-                <TableCell>{project.department}</TableCell>
-                <TableCell>{project.consultant}</TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="icon" onClick={() => onEdit(project)}>
+                  <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(project); }}>
                     <Edit className="h-4 w-4" />
                   </Button>
                 </TableCell>
