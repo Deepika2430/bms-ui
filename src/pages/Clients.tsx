@@ -42,7 +42,7 @@ const Clients = () => {
             <CardTitle className="flex justify-between items-center">
               <span>Clients</span>
               <Button 
-                onClick={() => setIsDialogOpen(true)}
+                onClick={() => {setIsDialogOpen(true) ; setEditingClient(null);}}
                 className="bg-white text-nav-accent hover:bg-gray-100"
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -57,8 +57,8 @@ const Clients = () => {
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogTitle>
-              {/* {editingClient ? "Edit Client" : "Create Client"} */}
+            <DialogTitle className="px-6">
+              {editingClient ? "Edit Client" : "Create Client"}
             </DialogTitle>
             <ClientForm 
               initialData={editingClient}

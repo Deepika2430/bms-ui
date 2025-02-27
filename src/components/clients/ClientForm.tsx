@@ -127,16 +127,13 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
   }, [sameAsMailing, mailingAddress, form]);
 
   return (
-    <Card className="shadow-lg">
-      <CardHeader className="bg-nav-accent text-white">
-        <CardTitle>{initialData ? "Edit Client" : "Create Client"}</CardTitle>
-      </CardHeader>
+    <Card className="border-none shadow-none p-0">
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="border rounded-lg shadow-md">
               <div
-                className="flex justify-between items-center p-4 cursor-pointer"
+                className={`flex justify-between items-center cursor-pointer ${isClientInfoOpen ? "pb-0 px-3 pt-3" : "p-3"}`}
                 onClick={() => setIsClientInfoOpen(!isClientInfoOpen)}
               >
                 <h2 className="text-lg font-semibold">Client Information</h2>
@@ -144,7 +141,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
               </div>
               {isClientInfoOpen && (
                 <div className="p-4 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                     <FormField
                       control={form.control}
                       name="companyName"
@@ -220,7 +217,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
 
             <div className="border rounded-lg shadow-md">
               <div
-                className="flex justify-between items-center p-4 cursor-pointer"
+                className={` flex justify-between items-center p-4 cursor-pointer ${isMailingInfoOpen ? "pb-0 px-3 pt-3" : "p-3"}`}
                 onClick={() => setIsMailingInfoOpen(!isMailingInfoOpen)}
               >
                 <h2 className="text-lg font-semibold">Mailing Address</h2>
@@ -228,7 +225,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
               </div>
               {isMailingInfoOpen && (
                 <div className="p-4 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                     <FormField
                       control={form.control}
                       name="contactPerson"
@@ -375,7 +372,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
 
             <div className="border rounded-lg shadow-md">
               <div
-                className="flex justify-between items-center p-4 cursor-pointer"
+                className={`flex justify-between items-center p-4 cursor-pointer ${isBillingInfoOpen ? "pb-0 px-3 pt-3" : "p-3"}`}
                 onClick={() => setIsBillingInfoOpen(!isBillingInfoOpen)}
               >
                 <h2 className="text-lg font-semibold">Billing Address</h2>
@@ -400,7 +397,7 @@ const ClientForm = ({ onSubmit, onCancel, initialData }: ClientFormProps) => {
                     )}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                     <FormField
                       control={form.control}
                       name="billingAttention"
