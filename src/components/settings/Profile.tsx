@@ -1,16 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getUserDetails } from "@/services/userService";
 
 const Profile = () => {
   const [formData, setFormData] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "+1 234 567 8900",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    role: "",
+    id: "",
+    departmentName: "",
   });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await getUserDetails();
+        setFormData({
+          firstName: response.firstName,
+          lastName: response.lastName,
+          email: response.email,
+          phone: response.phone,
+          role: response.role,
+          id: response.id,
+          departmentName: response.departmentName,
+        });
+        console.log(formData);
+      } catch (error) {
+        console.error("Failed to fetch user details:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({

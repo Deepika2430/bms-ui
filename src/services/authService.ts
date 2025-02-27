@@ -1,7 +1,9 @@
+import config from "@/config";
 import Cookies from "js-cookie";
+import {jwtDecode} from "jwt-decode";
 
 export const register = async (name: string, email: string, password: string) => {
-  const response = await fetch("http://localhost:4000/auth/register", {
+  const response = await fetch(`${config.apiBaseUrl}/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -17,7 +19,7 @@ export const register = async (name: string, email: string, password: string) =>
 };
 
 export const login = async (email: string, password: string) => {
-  const response = await fetch("http://localhost:4000/auth/login", {
+  const response = await fetch(`${config.apiBaseUrl}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -45,3 +47,13 @@ export const getToken = () => {
 export const clearAuthToken = () => {
   Cookies.remove("authToken");
 };
+
+export const getRole = (token: string) => {
+  interface DecodedToken {
+    role: string;
+    user: string;
+  }
+
+  const decodedToken = jwtDecode<DecodedToken>(token);
+  return decodedToken?.role;
+}
