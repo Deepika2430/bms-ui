@@ -34,7 +34,7 @@ const NotificationItem = ({ notification, onRead, className }: NotificationItemP
       <div className="flex-shrink-0 mt-1">{getNotificationIcon(notification.type)}</div>
       <div className="flex-1 min-w-0">
         <h4 className="text-sm font-medium">{notification.title}</h4>
-        <p className="text-xs text-muted-foreground mt-0.5">{notification.message}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{(notification?.message).substring(0, 47) + "..."}</p>
         <span className="text-xs text-muted-foreground mt-1 block">{formattedDate}</span>
       </div>
       {!notification.read && (
