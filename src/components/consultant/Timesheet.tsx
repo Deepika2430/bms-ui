@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { ChevronLeft, ChevronRight, Clock, CalendarIcon, CirclePlus } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";

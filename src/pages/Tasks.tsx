@@ -8,8 +8,8 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getProjects } from "@/services/projectService";
 import { getConsultants } from "@/services/consultantService";
-import { createTask, getTasks, updateTask } from "@/services/taskService";
-import { toast } from "@/components/ui/use-toast"; // Import toast
+import { createTask, getTasks, updateTask, deleteTask } from "@/services/taskService";
+import { toast } from "react-toastify";
 
 const Tasks = () => {
   const [projects, setProjects] = useState([]);
@@ -27,11 +27,7 @@ const Tasks = () => {
         setConsultants(consultantsData);
       } catch (error) {
         console.error("Error fetching master data:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load projects and consultants",
-          variant: "destructive",
-        });
+        toast.error("Failed to load projects and consultants");
       }
     };
     fetchMasterData();
@@ -44,11 +40,7 @@ const Tasks = () => {
         setTasks(tasksData);
       } catch (error) {
         console.error("Error fetching tasks:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load tasks",
-          variant: "destructive",
-        });
+        toast.error("Failed to load tasks");
       }
     };
     fetchTasks();
@@ -63,11 +55,7 @@ const Tasks = () => {
       setTasks(tasksData);
     } catch (error) {
       console.error("Error fetching tasks:", error);
-      toast({
-        title: "Error",
-        description: "Failed to refresh tasks",
-        variant: "destructive",
-      });
+      toast.error("Failed to refresh tasks");
     }
   };
 
@@ -122,17 +110,12 @@ const Tasks = () => {
       };
 
       if (editingTask) {
+        console.log(task);
         await updateTask(editingTask.id, task);
-        toast({
-          title: "Success",
-          description: "Task updated successfully",
-        });
+        toast.success("Task updated successfully");
       } else {
         await createTask(task);
-        toast({
-          title: "Success",
-          description: "Task created successfully",
-        });
+        toast.success("Task created successfully");
       }
 
       await refreshTasks();
@@ -140,11 +123,7 @@ const Tasks = () => {
       setEditingTask(null);
     } catch (error) {
       console.error("Error creating/updating task:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create/update task",
-        variant: "destructive",
-      });
+      toast.error("Failed to create/update task");
     }
   };
 
@@ -158,6 +137,17 @@ const Tasks = () => {
   const handleCreateTask = () => {
     setDialogMode('create');
     setIsDialogOpen(true);
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      await deleteTask(taskId);
+      toast.success("Task deleted successfully");
+      await refreshTasks(); // Refresh the task list
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      toast.error("Failed to delete task");
+    }
   };
 
   return (
@@ -182,6 +172,7 @@ const Tasks = () => {
               onCreateTask={handleCreateTask}
               onEditTask={handleEditTask}
               onViewTask={handleViewTask}
+              onDeleteTask={handleDeleteTask}
             />
             <TaskAssignment tasks={tasks} consultants={consultants} />
           </CardContent>

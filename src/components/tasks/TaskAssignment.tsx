@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {assignTask} from "@/services/taskService"
+import { toast } from "react-toastify";
+import { createNotification } from "@/services/notificationService";
 
 interface Task {
   id: string;
@@ -12,6 +14,12 @@ interface Task {
   startDate: string;
   endDate: string;
   assignedTo: string;
+  status: string;
+  priority: string;
+  estimatedHours: string;
+  description: string;
+  assignedBy: string;
+  assignedUsers?: any[];
 }
 
 interface Consultant {
@@ -25,34 +33,57 @@ interface TaskAssignmentProps {
 }
 
 const TaskAssignment = ({ tasks, consultants }: TaskAssignmentProps) => {
-  const [selectedTask, setSelectedTask] = useState("");
-  const [selectedConsultant, setSelectedConsultant] = useState("");
-  const [isBillable, setIsBillable] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedConsultant, setSelectedConsultant] = useState<string>("");
 
   const handleAssign = async () => {
-    // Logic to assign the task to the consultant
-    console.log(`Assigned task ${selectedTask} to consultant ${selectedConsultant} (Billable: ${isBillable})`);
-    await assignTask(selectedTask, selectedConsultant);
+    if (!selectedTask || !selectedConsultant) {
+      toast.error("Please select both task and consultant");
+      return;
+    }
+
+    try {
+      await assignTask(selectedTask.id, selectedConsultant);
+      await createNotification(selectedConsultant, `${selectedTask.taskTitle} has been assigned to you(${selectedTask.description})`);
+      toast.success(`Task "${selectedTask.taskTitle}" assigned to consultant successfully`);
+
+      // Reset selections after successful assignment
+      setSelectedTask(null);
+      setSelectedConsultant("");
+    } catch (error) {
+      toast.error("Failed to assign task");
+      console.error("Error assigning task:", error);
+    }
   };
 
   return (
     <div className="space-y-4 mt-8">
       <h2 className="text-2xl font-semibold">Assign Task to Consultant</h2>
       <div className="flex gap-4">
-        <Select onValueChange={setSelectedTask} defaultValue="">
-          <SelectTrigger>
+        <Select
+          value={selectedTask?.id || ""}
+          onValueChange={(taskId) => {
+            const task = tasks.find(t => t.id === taskId);
+            setSelectedTask(task || null);
+          }}
+        >
+          <SelectTrigger className="w-[300px]">
             <SelectValue placeholder="Select Task..." />
           </SelectTrigger>
           <SelectContent>
             {tasks.map((task) => (
               <SelectItem key={task.id} value={task.id}>
-                {task.taskTitle}
+                {task.taskTitle} ({task.project})
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select onValueChange={setSelectedConsultant} defaultValue="">
-          <SelectTrigger>
+
+        <Select
+          value={selectedConsultant}
+          onValueChange={setSelectedConsultant}
+        >
+          <SelectTrigger className="w-[300px]">
             <SelectValue placeholder="Select Consultant..." />
           </SelectTrigger>
           <SelectContent>
@@ -63,10 +94,17 @@ const TaskAssignment = ({ tasks, consultants }: TaskAssignmentProps) => {
             ))}
           </SelectContent>
         </Select>
-        <Button onClick={handleAssign} disabled={!selectedTask || !selectedConsultant}>
+
+        <Button
+          onClick={handleAssign}
+          disabled={!selectedTask || !selectedConsultant}
+          className="bg-nav-accent text-white hover:bg-nav-accent/90"
+        >
           Assign
         </Button>
       </div>
+
+
     </div>
   );
 };

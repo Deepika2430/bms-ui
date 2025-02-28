@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
 import ProjectForm from "@/components/projects/ProjectForm";
 import ProjectTable from "@/components/projects/ProjectTable";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -20,7 +20,7 @@ const Projects = () => {
   const [editingProject, setEditingProject] = useState<any>(null);
   const [viewingProject, setViewingProject] = useState<any>(null);
   const [projects, setProjects] = useState<any[]>([]);
-  const { toast } = useToast();
+
 
   useEffect(() => {
     refreshProjects();
@@ -29,16 +29,10 @@ const Projects = () => {
   const handleCreateProject = async (data: any) => {
     if (editingProject) {
       await updateProject(editingProject.id, data);
-      toast({
-        title: "Success",
-        description: "Project updated successfully",
-      });
+      toast.success("Project updated successfully");
     } else {
       await createProject(data);
-      toast({
-        title: "Success",
-        description: "Project created successfully",
-      });
+      toast.success("Project created successfully");
     }
     setIsDialogOpen(false);
     setEditingProject(null);

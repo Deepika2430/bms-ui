@@ -1,6 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Edit, Search, Plus } from "lucide-react";
+import { Edit, Search, Plus, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import {
   Table,
@@ -34,10 +44,12 @@ interface TaskTableProps {
   onCreateTask: () => void;
   onEditTask: (task: Task) => void;
   onViewTask: (task: Task) => void;
+  onDeleteTask: (taskId: string) => void;
 }
 
-const TaskTable = ({ tasks, onCreateTask, onEditTask, onViewTask }: TaskTableProps) => {
+const TaskTable = ({ tasks, onCreateTask, onEditTask, onViewTask, onDeleteTask }: TaskTableProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   const filteredTasks = tasks?.filter((task) =>
     Object.values(task).some(
@@ -109,22 +121,60 @@ const TaskTable = ({ tasks, onCreateTask, onEditTask, onViewTask }: TaskTablePro
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEditTask(task);
-                    }}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEditTask(task);
+                      }}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTaskToDelete(task.id);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+
+      <AlertDialog open={!!taskToDelete} onOpenChange={() => setTaskToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the task.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 text-white hover:bg-red-700"
+              onClick={() => {
+                if (taskToDelete) {
+                  onDeleteTask(taskToDelete);
+                  setTaskToDelete(null);
+                }
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

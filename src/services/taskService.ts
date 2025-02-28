@@ -121,15 +121,39 @@ export const assignTask = async (taskId: string, consultantId: string) => {
             redirect: "follow"
         });
 
+        const assignedTask = await response.json();
+        if (!response.ok) {
+            throw new Error(`${assignedTask?.error}`);
+        }
+        return assignedTask;
+
+    }
+    catch (error) {
+        console.error("Error assigning task: ", error);
+        throw error;
+    }
+};
+
+export const deleteTask = async (taskId: string) => {
+    const token = getToken();
+    try {
+        const response = await fetch(`${config.apiBaseUrl}/tasks/${taskId}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            redirect: "follow"
+        });
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const assignedTask = await response.json();
-        return assignedTask;
+        return await response.json();
     }
     catch (error) {
-        console.error("Error assigning task:", error);
+        console.error("Error deleting task:", error);
         throw error;
     }
 };

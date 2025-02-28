@@ -297,6 +297,9 @@ const TaskForm = ({ projects, consultants, submitData, onCancel, initialData, re
                 <Button
                   type="submit"
                   className="bg-nav-accent text-white"
+                  onClick={() => {
+                    handleSubmit(form.getValues());
+                  }}
                 >
                   {initialData ? "Update Task" : "Create Task"}
                 </Button>

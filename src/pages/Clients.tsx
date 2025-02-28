@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
 import ClientForm from "@/components/clients/ClientForm";
 import ClientTable from "@/components/clients/ClientTable";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -11,16 +11,9 @@ const Clients = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<any>(null);
   const [viewingClient, setViewingClient] = useState<any>(null);
-  const { toast } = useToast();
 
   const handleCreateClient = (data: any) => {
-    console.log(editingClient ? "Updating client:" : "Creating client:", data);
-    toast({
-      title: "Success",
-      description: editingClient
-        ? "Client updated successfully"
-        : "Client created successfully",
-    });
+    editingClient ? toast.success("Client updated successfully") : toast.success("Client created successfully");
     setIsDialogOpen(false);
     setEditingClient(null);
   };
