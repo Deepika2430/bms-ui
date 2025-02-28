@@ -32,39 +32,41 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import NotificationItem from "./NotificationItem";  
+import { getNotifications } from "@/services/notificationService";
 
-const demoNotifications: Notification[] = [
-  {
-    id: "1",
-    userId: "1",
-    title: "New task assigned",
-    message: "You have been assigned to 'Create project proposal' task",
-    type: "task",
-    referenceId: "task-1",
-    createdAt: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
-    read: false,
-  },
-  {
-    id: "2",
-    userId: "1",
-    title: "Timesheet approved",
-    message: "Your timesheet for last week has been approved",
-    type: "timesheet",
-    referenceId: "timesheet-1",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-    read: false,
-  },
-  {
-    id: "3",
-    userId: "1",
-    title: "Project status updated",
-    message: "Project 'Website Redesign' status changed to 'In Progress'",
-    type: "project",
-    referenceId: "project-1",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-    read: true,
-  },
-];
+// const demoNotifications: Notification[] = [
+//   {
+//     id: "1",
+//     userId: "1",
+//     title: "New task assigned",
+//     message: "You have been assigned to 'Create project proposal' task",
+//     type: "task",
+//     referenceId: "task-1",
+//     createdAt: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
+//     read: false,
+//   },
+//   {
+//     id: "2",
+//     userId: "1",
+//     title: "Timesheet approved",
+//     message: "Your timesheet for last week has been approved",
+//     type: "timesheet",
+//     referenceId: "timesheet-1",
+//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+//     read: false,
+//   },
+//   {
+//     id: "3",
+//     userId: "1",
+//     title: "Project status updated",
+//     message: "Project 'Website Redesign' status changed to 'In Progress'",
+//     type: "project",
+//     referenceId: "project-1",
+//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+//     read: true,
+//   },
+// ];
+
 
 interface NavLink {
   path: string;
@@ -82,8 +84,17 @@ const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
-  const [notifications, setNotifications] = useState<Notification[]>(demoNotifications);
+  const [notifications, setNotifications] = useState([]);
   
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const response = await getNotifications();
+      console.log(response);
+      setNotifications(response);
+    };
+    fetchNotifications();
+  }, []);
+
   const unreadCount = notifications.filter(n => !n.read).length;
   
   const handleMarkAsRead = (id: string) => {

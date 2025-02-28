@@ -1,10 +1,10 @@
-import { getToken } from "../utils/auth";
+import { getToken } from "./authService";
 import config from "../config";
 
-export const getClient = async (clientId) => {
+export const getNotifications = async () => {
     const token = getToken();
     try {
-        const response = await fetch(`${config.apiBaseUrl}/clients/${clientId}`, {
+        const response = await fetch(`${config.apiBaseUrl}/user/notifications`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -12,7 +12,17 @@ export const getClient = async (clientId) => {
             },
             redirect: "follow"
         });
-        return response.json();
+        const notifications= await response.json();
+        return notifications.map((notification) => {
+            return {
+                id: notification.id,
+                title: notification.message,
+                message: notification.message,
+                type: "",
+                read: notification.is_read,
+                createdAt: notification.created_at,
+            }
+        })
     }
     catch (error) {
         return error?.message;

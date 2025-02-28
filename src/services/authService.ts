@@ -27,11 +27,11 @@ export const login = async (email: string, password: string) => {
     body: JSON.stringify({ email, password }),
   });
 
+  const data = await response.json();
   if (!response.ok) {
-    throw new Error("Login failed");
+    throw new Error(`Login failed ${data.error}`);
   }
 
-  const data = await response.json();
   localStorage.setItem("token", data.token);
   return data;
 };

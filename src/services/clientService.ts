@@ -42,7 +42,7 @@ export const updateClient = async (clientId, client) => {
             body: JSON.stringify(transformClientData(client)),
             redirect: "follow"
         });
-        return response.json();
+        return await response.json();
     }
     catch (error) {
         return error?.message;
@@ -61,7 +61,7 @@ export const createClient = async (client) => {
             body: JSON.stringify(transformClientData(client)),
             redirect: "follow"
         });
-        return response.json();
+        return await response.json();
     }
     catch (error) {
         return error?.message;
@@ -79,7 +79,7 @@ export const getClient = async (clientId) => {
             },
             redirect: "follow"
         });
-        return response.json();
+        return await response.json();
     }
     catch (error) {
         return error?.message;

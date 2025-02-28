@@ -39,7 +39,7 @@ export const updateProject = async (projectId, project) => {
             body: JSON.stringify(transformProjectData(project)),
             redirect: "follow"
         });
-        return response.json();
+        return await response.json();
     }
     catch (error) {
         return error?.message;
@@ -58,7 +58,7 @@ export const createProject = async (project) => {
             body: JSON.stringify(transformProjectData(project)),
             redirect: "follow"
         });
-        return response.json();
+        return await response.json();
     }
     catch (error) {
         return error?.message;
@@ -76,7 +76,7 @@ export const getProject = async (projectId) => {
             },
             redirect: "follow"
         });
-        return response.json();
+        return await response.json();
     }
     catch (error) {
         return error?.message;
