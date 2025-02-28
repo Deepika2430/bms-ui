@@ -15,8 +15,8 @@ export const getUserDetails = async () => {
         return {
             firstName: userDetails?.employee_details.first_name,
             lastName: userDetails?.employee_details.last_name,
-            role: userDetails?.employee_details.role,
-            id: userDetails?.employee_details.id,
+            role: userDetails?.role,
+            id: userDetails?.id,
             phone: userDetails?.employee_details.phone,
             email: userDetails?.email,
             departmentName: userDetails?.departments?.name,

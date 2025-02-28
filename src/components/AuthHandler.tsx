@@ -5,25 +5,33 @@ import Index from "../pages/Index";
 import Projects from "../pages/Projects";
 import Clients from "../pages/Clients";
 import Tasks from "../pages/Tasks";
+import ManagerTasks from "../components/managers/TaskList";
+import Timesheet from "./consultant/TimeSheet";
+import ConsultantTasks from "./consultant/Tasks";
 import Settings from "../pages/Settings";
 import BmsHome from "../pages/BmsHome";
 import AuthForm from "../components/AuthForm";
 import NotFound from "../pages/NotFound";
-import SignOut from "./Signout";
-import { getToken } from "../services/authService";
+import { getToken, getRole } from "../services/authService";
 
 const AuthHandler = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!getToken());
+  const [role, setRole] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleAuthChange = () => {
       const token = getToken();
       setIsAuthenticated(!!token);
-      console.log("Authentication updated:", !!token);
 
       if (token) {
+        const userRole = getRole(token) || null; // Handle undefined role
+        setRole(userRole);
+        console.log("Role:", userRole);
+        console.log("Authentication updated:", !!token);
         navigate("/home", { replace: true });
+      } else {
+        setRole(null);
       }
     };
 
@@ -43,16 +51,34 @@ const AuthHandler = () => {
       {/* Public Routes */}
       <Route path="/" element={<BmsHome />} />
       <Route path="/login" element={<AuthForm />} />
-      <Route path="/signout" element={<SignOut />} />
 
       {/* Protected Routes */}
       {isAuthenticated ? (
         <Route path="/" element={<Layout />}>
           <Route path="home" element={<Index />} />
-          <Route path="projects" element={<Projects />} />
-          <Route path="clients" element={<Clients />} />
-          <Route path="tasks" element={<Tasks />} />
-          <Route path="settings" element={<Settings />} />
+          {role === "admin" && (
+            <>
+              <Route path="projects" element={<Projects />} />
+              <Route path="clients" element={<Clients />} />
+              <Route path="settings" element={<Settings />} />
+            </>
+          )}
+          {role === "manager" && (
+            <>
+              <Route path="tasks" element={<ManagerTasks />} />
+              <Route path="settings" element={<Settings />} />
+            </>
+          )}
+          {role === "consultant" && (
+            <>
+              <Route path="tasks" element={<ConsultantTasks />} />
+              <Route path="/timesheet" element={<Timesheet />} />
+              <Route path="settings" element={<Settings />} />
+            </>
+          )}
+          {["admin", "manager", "consultant", "associate-consultant"].includes(role ?? "") && (
+            <Route path="tasks" element={<Tasks />} />
+          )}
           <Route path="*" element={<NotFound />} />
         </Route>
       ) : (
