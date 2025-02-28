@@ -14,10 +14,11 @@ export const getNotifications = async () => {
         });
         const notifications= await response.json();
         return notifications.map((notification) => {
+            const match = notification.message.match(/(.*)\s*\((.*?)\)$/);
             return {
                 id: notification.id,
-                title: notification.message,
-                message: notification.message,
+                title: match ? match[1].trim() : notification.message,
+                message: match ? match[2].trim() : notification.message,
                 type: "",
                 read: notification.is_read,
                 createdAt: notification.created_at,
@@ -42,10 +43,11 @@ export const getNotificationsHistory = async () => {
         });
         const notifications= await response.json();
         return notifications.map((notification) => {
+            const match = notification.message.match(/(.*)\s*\((.*?)\)$/);
             return {
                 id: notification.id,
-                title: notification.message,
-                message: notification.message,
+                title: match ? match[1].trim() : notification.message,
+                message: match ? match[2].trim() : notification.message,
                 type: "",
                 read: notification.is_read,
                 createdAt: notification.created_at,
