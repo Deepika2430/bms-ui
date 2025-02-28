@@ -41,20 +41,22 @@ const projectSchema = z.object({
   projectCode: z.string().min(1, "Project code is required"),
   projectName: z.string().min(1, "Project name is required"),
   projectDescription: z.string().min(1, "Project description is required"),
-  plannedStartDate: z.date({
+  plannedStartDate: z.number({
     required_error: "Planned start date is required",
   }),
-  plannedEndDate: z.date({ required_error: "Planned end date is required" }),
-  revisedPlannedEndDate: z.date().optional(),
-  actualStartDate: z.date().optional(),
-  actualEndDate: z.date().optional(),
+  plannedEndDate: z.number({
+    required_error: "Planned end date is required"
+  }),
+  revisedPlannedEndDate: z.number().optional(),
+  actualStartDate: z.number().optional(),
+  actualEndDate: z.number().optional(),
   contractedEfforts: z.string().optional(),
   plannedEfforts: z.string().optional(),
   poNumber: z.string().optional(),
   poAmount: z.string().optional(),
   currency: z.string().optional(),
-  poStartDate: z.date().optional(),
-  poEndDate: z.date().optional(),
+  poStartDate: z.number().optional(),
+  poEndDate: z.number().optional(),
   poValidity: z.string().optional(),
   poUpliftmentDetails: z.string().optional(),
   comments: z.string().optional(),
@@ -90,18 +92,18 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
       projectCode: initialData?.projectCode ?? "",
       projectName: initialData?.projectName ?? "",
       projectDescription: initialData?.projectDescription ?? "",
-      plannedStartDate: initialData?.plannedStartDate ? new Date(initialData.plannedStartDate) : undefined,
-      plannedEndDate: initialData?.plannedEndDate ? new Date(initialData.plannedEndDate) : undefined,
-      revisedPlannedEndDate: initialData?.revisedPlannedEndDate ? new Date(initialData.revisedPlannedEndDate) : undefined,
-      actualStartDate: initialData?.actualStartDate ? new Date(initialData.actualStartDate) : undefined,
-      actualEndDate: initialData?.actualEndDate ? new Date(initialData.actualEndDate) : undefined,
+      plannedStartDate: initialData?.plannedStartDate ? new Date(initialData.plannedStartDate).getTime() : null,
+      plannedEndDate: initialData?.plannedEndDate ? new Date(initialData.plannedEndDate).getTime() : null,
+      revisedPlannedEndDate: initialData?.revisedPlannedEndDate ? new Date(initialData.revisedPlannedEndDate).getTime() : null,
+      actualStartDate: initialData?.actualStartDate ? new Date(initialData.actualStartDate).getTime() : null,
+      actualEndDate: initialData?.actualEndDate ? new Date(initialData.actualEndDate).getTime() : null,
       contractedEfforts: initialData?.contractedEfforts ?? "",
       plannedEfforts: initialData?.plannedEfforts ?? "",
       poNumber: initialData?.poNumber ?? "",
       poAmount: initialData?.poAmount ?? "",
       currency: initialData?.currency ?? "",
-      poStartDate: initialData?.poStartDate ? new Date(initialData.poStartDate) : undefined,
-      poEndDate: initialData?.poEndDate ? new Date(initialData.poEndDate) : undefined,
+      poStartDate: initialData?.poStartDate ? new Date(initialData.poStartDate).getTime() : null,
+      poEndDate: initialData?.poEndDate ? new Date(initialData.poEndDate).getTime() : null,
       poValidity: initialData?.poValidity ?? "",
       poUpliftmentDetails: initialData?.poUpliftmentDetails ?? "",
       comments: initialData?.comments ?? "",
@@ -122,22 +124,21 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
   const [consultants, setConsultants] = useState([]);
 
   useEffect(() => {
-    const fetchClients = async () => {
-      const clientsData = await getClients();
-      setClients(clientsData);
+    const fetchMasterData = async () => {
+      try{
+        setConsultants(await getConsultants());
+        setDepartments(await getDepartments());
+        setClients(await getClients());
+      } catch (error) {
+        console.log(error);
+        setClients([]);
+        setClients([]);
+        setDepartments([]);
+      }
     };
 
-    const fetchDepartments = async () => {
-      setDepartments(await getDepartments());
-    };
+    fetchMasterData();
 
-    const fetchConsultants = async () => {
-      setConsultants(await getConsultants());
-    };
-
-    fetchClients();
-    fetchDepartments();
-    fetchConsultants();
   }, []);
 
   const currencies = [
@@ -204,7 +205,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {clients.map((client) => (
+                              {clients?.map((client) => (
                                 <SelectItem key={client.id} value={client.id}>
                                   {client.companyName}
                                 </SelectItem>
@@ -258,50 +259,50 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                       )}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name="plannedStartDate"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>Planned Start Date*</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  className={cn(
-                                    "border-2 shadow-md w-[300px] pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "PPP")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date < new Date("1900-01-01")
-                                }
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                      <FormField
+                        control={form.control}
+                        name="plannedStartDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Planned Start Date*</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      "border-2 shadow-md w-[300px] pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(new Date(field.value), "PPP")
+                                    ) : (
+                                      <span>Pick a date</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value ? new Date(field.value) : undefined}
+                                  onSelect={(date) => {
+                                    const selectedDate = Array.isArray(date) ? date[0] : date;
+                                    if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
+                                      field.onChange(selectedDate.getTime());
+                                    }
+                                  }}
+                                  disabled={(date) => date < new Date("1900-01-01")}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                     <FormField
                       control={form.control}
@@ -320,7 +321,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                   )}
                                 >
                                   {field.value ? (
-                                    format(field.value, "PPP")
+                                    format(new Date(field.value), "PPP")
                                   ) : (
                                     <span>Pick a date</span>
                                   )}
@@ -328,17 +329,17 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date < new Date("1900-01-01")
-                                }
+                                selected={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => {
+                                  const selectedDate = Array.isArray(date) ? date[0] : date;
+                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
+                                    field.onChange(selectedDate.getTime());
+                                  }
+                                }}
+                                disabled={(date) => date < new Date("1900-01-01")}
                                 initialFocus
                               />
                             </PopoverContent>
@@ -365,7 +366,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                   )}
                                 >
                                   {field.value ? (
-                                    format(field.value, "PPP")
+                                    format(new Date(field.value), "PPP")
                                   ) : (
                                     <span>Pick a date</span>
                                   )}
@@ -373,17 +374,17 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date < new Date("1900-01-01")
-                                }
+                                selected={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => {
+                                  const selectedDate = Array.isArray(date) ? date[0] : date;
+                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
+                                    field.onChange(selectedDate.getTime());
+                                  }
+                                }}
+                                disabled={(date) => date < new Date("1900-01-01")}
                                 initialFocus
                               />
                             </PopoverContent>
@@ -410,7 +411,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                   )}
                                 >
                                   {field.value ? (
-                                    format(field.value, "PPP")
+                                    format(new Date(field.value), "PPP")
                                   ) : (
                                     <span>Pick a date</span>
                                   )}
@@ -418,17 +419,17 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date < new Date("1900-01-01")
-                                }
+                                selected={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => {
+                                  const selectedDate = Array.isArray(date) ? date[0] : date;
+                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
+                                    field.onChange(selectedDate.getTime());
+                                  }
+                                }}
+                                disabled={(date) => date < new Date("1900-01-01")}
                                 initialFocus
                               />
                             </PopoverContent>
@@ -455,7 +456,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                   )}
                                 >
                                   {field.value ? (
-                                    format(field.value, "PPP")
+                                    format(new Date(field.value), "PPP")
                                   ) : (
                                     <span>Pick a date</span>
                                   )}
@@ -463,17 +464,17 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date < new Date("1900-01-01")
-                                }
+                                selected={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => {
+                                  const selectedDate = Array.isArray(date) ? date[0] : date;
+                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
+                                    field.onChange(selectedDate.getTime());
+                                  }
+                                }}
+                                disabled={(date) => date < new Date("1900-01-01")}
                                 initialFocus
                               />
                             </PopoverContent>
@@ -587,7 +588,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                   )}
                                 >
                                   {field.value ? (
-                                    format(field.value, "PPP")
+                                    format(new Date(field.value), "PPP")
                                   ) : (
                                     <span>Pick a date</span>
                                   )}
@@ -595,17 +596,17 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date < new Date("1900-01-01")
-                                }
+                                selected={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => {
+                                  const selectedDate = Array.isArray(date) ? date[0] : date;
+                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
+                                    field.onChange(selectedDate.getTime());
+                                  }
+                                }}
+                                disabled={(date) => date < new Date("1900-01-01")}
                                 initialFocus
                               />
                             </PopoverContent>
@@ -632,7 +633,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                   )}
                                 >
                                   {field.value ? (
-                                    format(field.value, "PPP")
+                                    format(new Date(field.value), "PPP")
                                   ) : (
                                     <span>Pick a date</span>
                                   )}
@@ -640,17 +641,17 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date < new Date("1900-01-01")
-                                }
+                                selected={field.value ? new Date(field.value) : undefined}
+                                onSelect={(date) => {
+                                  const selectedDate = Array.isArray(date) ? date[0] : date;
+                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
+                                    field.onChange(selectedDate.getTime());
+                                  }
+                                }}
+                                disabled={(date) => date < new Date("1900-01-01")}
                                 initialFocus
                               />
                             </PopoverContent>

@@ -31,7 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import NotificationItem from "./NotificationItem";  
+import NotificationItem from "./NotificationItem";
 import { getNotifications } from "@/services/notificationService";
 
 // const demoNotifications: Notification[] = [
@@ -85,7 +85,7 @@ const Navigation = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [notifications, setNotifications] = useState([]);
-  
+
   useEffect(() => {
     const fetchNotifications = async () => {
       const response = await getNotifications();
@@ -95,14 +95,14 @@ const Navigation = () => {
     fetchNotifications();
   }, []);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
-  
+  const unreadCount = notifications?.filter(n => !n.read).length;
+
   const handleMarkAsRead = (id: string) => {
     setNotifications(
       notifications.map(n => (n.id === id ? { ...n, read: true } : n))
     );
   };
-  
+
   const handleMarkAllAsRead = () => {
     setNotifications(notifications.map(n => ({ ...n, read: true })));
   };

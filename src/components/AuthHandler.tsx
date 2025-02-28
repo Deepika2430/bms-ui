@@ -66,7 +66,8 @@ const AuthHandler = () => {
           )}
           {role === "manager" && (
             <>
-              <Route path="tasks" element={<ManagerTasks />} />
+            <Route path="projects" element={<Projects />} />
+              <Route path="tasks" element={<Tasks />} />
               <Route path="settings" element={<Settings />} />
             </>
           )}
