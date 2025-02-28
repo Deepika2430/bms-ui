@@ -29,43 +29,44 @@ const TaskCard = ({ task, assignee, onClick, className }: TaskCardProps) => {
       onClick={onClick}
     >
       <div className="flex justify-between items-start mb-2">
-        <h3 className="font-medium text-base truncate">{task.title}</h3>
-        <StatusBadge status={task.status} />
+        <h3 className="font-medium text-base truncate">{task?.title}</h3>
+        <StatusBadge status={task?.status} />
       </div>
       
-      <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{task.description}</p>
+      <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{task?.description}</p>
       
       <div className="flex items-center gap-2 mt-1 mb-3">
         <span className={cn("text-xs px-2 py-0.5 rounded-full", priorityColors[task.priority])}>
-          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+          {task?.priority?.charAt(0).toUpperCase() + task?.priority?.slice(1)} Priority
         </span>
       </div>
       
-      {task.dueDate && (
+      {task.due_date && (
         <div className="flex items-center text-xs text-muted-foreground gap-1 mb-1">
           <Calendar className="h-3.5 w-3.5" />
-          <span>Due: {format(new Date(task.dueDate), "MMM d, yyyy")}</span>
+          <span>Due: {format(new Date(task.due_date), "MMM d, yyyy")}</span>
         </div>
       )}
       
-      {task.estimatedHours && (
+      {task.estimated_hours && (
         <div className="flex items-center text-xs text-muted-foreground gap-1 mb-3">
           <Clock className="h-3.5 w-3.5" />
-          <span>Est: {task.estimatedHours} hours</span>
+          <span>Est: {task.estimated_hours} hours</span>
         </div>
       )}
       
       <div className="flex items-center justify-between mt-auto pt-2 border-t border-border">
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">
-            <AvatarImage src={assignee.avatar} alt={assignee.name} />
-            <AvatarFallback>{assignee.name.charAt(0)}</AvatarFallback>
+            <AvatarImage src={assignee?.avatar} alt={assignee?.name} />
+            <AvatarFallback>{assignee?.name.charAt(0)}</AvatarFallback>
           </Avatar>
-          <span className="text-xs">{assignee.name}</span>
+          <span className="text-xs">{assignee?.name}</span>
         </div>
         
         <span className="text-xs text-muted-foreground">
-          Created {format(new Date(task.createdAt), "MMM d")}
+          {/* Created {format(new Date(task?.created_at), "MMM d")} */}
+          Created at {task?.created_at}
         </span>
       </div>
     </div>

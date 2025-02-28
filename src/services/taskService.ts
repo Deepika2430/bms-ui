@@ -157,3 +157,27 @@ export const deleteTask = async (taskId: string) => {
         throw error;
     }
 };
+
+export const getAssignedTasks = async () => {
+    const token = getToken();
+    try {
+        const response = await fetch(`${config.apiBaseUrl}/user/tasks/assigned`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            redirect: "follow"
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const assignedTasks = await response.json();
+        return assignedTasks;
+    }   
+    catch (error) {
+        console.log(error);
+    }
+}
