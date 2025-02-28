@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {assignTask} from "@/services/taskService"
 
 interface Task {
   id: string;
@@ -28,9 +29,10 @@ const TaskAssignment = ({ tasks, consultants }: TaskAssignmentProps) => {
   const [selectedConsultant, setSelectedConsultant] = useState("");
   const [isBillable, setIsBillable] = useState(false);
 
-  const handleAssign = () => {
+  const handleAssign = async () => {
     // Logic to assign the task to the consultant
     console.log(`Assigned task ${selectedTask} to consultant ${selectedConsultant} (Billable: ${isBillable})`);
+    await assignTask(selectedTask, selectedConsultant);
   };
 
   return (
@@ -61,10 +63,6 @@ const TaskAssignment = ({ tasks, consultants }: TaskAssignmentProps) => {
             ))}
           </SelectContent>
         </Select>
-        <div className="flex items-center gap-2">
-          <Checkbox checked={isBillable} onCheckedChange={setIsBillable} />
-          <label>Billable</label>
-        </div>
         <Button onClick={handleAssign} disabled={!selectedTask || !selectedConsultant}>
           Assign
         </Button>

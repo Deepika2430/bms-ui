@@ -30,7 +30,10 @@ export const getTasks = async () => {
             createdAt: task.created_at,
             updatedAt: task.updated_at,
             projectId: task.project_id,
-            assignedToId: task.assigned_to
+            assignedToId: task.assigned_to,
+            assignedById: task.assigned_by,
+            assignedBy: task.tasks?.name || "Admin",
+            assignedUsers: task.task_assignments,
         }));
     }
     catch (error) {
@@ -101,6 +104,32 @@ export const updateTask = async (taskId: string, task: any) => {
     }
     catch (error) {
         console.error("Error updating task:", error);
+        throw error;
+    }
+};
+
+export const assignTask = async (taskId: string, consultantId: string) => {
+    const token = getToken();
+    try {
+        const response = await fetch(`${config.apiBaseUrl}/task-assignment`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ user_id: consultantId, task_id: taskId }),
+            redirect: "follow"
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const assignedTask = await response.json();
+        return assignedTask;
+    }
+    catch (error) {
+        console.error("Error assigning task:", error);
         throw error;
     }
 };

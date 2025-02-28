@@ -81,7 +81,8 @@ const Tasks = () => {
       status: task.status,
       priority: task.priority,
       estimatedHours: task.estimatedHours,
-      assignedTo: task.assignedToId,
+      assignedBy: task.assignedById,
+      assignedUsers: task.assignedUsers,
     };
     setViewingTask({ ...formattedTask, id: task.id });
     setDialogMode('view');
@@ -99,6 +100,7 @@ const Tasks = () => {
       priority: task.priority,
       estimatedHours: task.estimatedHours,
       assignedTo: task.assignedToId,
+      assignedBy: task.assignedById,
     };
     setEditingTask({ ...formattedTask, id: task.id });
     setDialogMode('edit');

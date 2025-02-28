@@ -62,7 +62,7 @@ const TaskForm = ({ projects, consultants, submitData, onCancel, initialData, re
       status: initialData?.status || "open",
       priority: initialData?.priority || "",
       estimatedHours: initialData?.estimatedHours || "",
-      assignedTo: initialData?.assignedTo || "",
+      assignedUsers: initialData?.assignedUsers || [],
     },
   });
 
@@ -266,34 +266,23 @@ const TaskForm = ({ projects, consultants, submitData, onCancel, initialData, re
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="assignedTo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assigned To*</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={!selectedProject || readOnly}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Consultant..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {consultants?.map((consultant) => (
-                          <SelectItem key={consultant?.id} value={consultant?.id}>
-                            {consultant?.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {readOnly && (
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">Task Participants</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {initialData?.assignedUsers?.map((assignmentTo) => (
+                      <div
+                        key={assignmentTo.users.id}
+                        className="p-4 bg-gray-100 rounded-lg flex items-center shadow-sm transition duration-200 hover:bg-gray-200"
+                      >
+                        <span className="text-gray-700 font-medium">{assignmentTo.users?.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+
             </div>
 
             <div className="flex justify-end space-x-4">

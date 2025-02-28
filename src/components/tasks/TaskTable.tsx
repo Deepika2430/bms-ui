@@ -25,6 +25,8 @@ interface Task {
   description?: string;
   priority?: string;
   estimatedHours?: string;
+  assignedBy?: string;
+  taskAssignments?: any[];
 }
 
 interface TaskTableProps {
@@ -84,7 +86,7 @@ const TaskTable = ({ tasks, onCreateTask, onEditTask, onViewTask }: TaskTablePro
               <TableHead>Task Title</TableHead>
               <TableHead>Start Date</TableHead>
               <TableHead>End Date</TableHead>
-              <TableHead>Assigned To</TableHead>
+              <TableHead>Assigned By</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -100,7 +102,7 @@ const TaskTable = ({ tasks, onCreateTask, onEditTask, onViewTask }: TaskTablePro
                 <TableCell>{task.taskTitle}</TableCell>
                 <TableCell>{new Date(task.startDate).toLocaleDateString()}</TableCell>
                 <TableCell>{new Date(task.endDate).toLocaleDateString()}</TableCell>
-                <TableCell>{task.assignedTo}</TableCell>
+                <TableCell>{task.assignedBy}</TableCell>
                 <TableCell>
                   <Badge className={getStatusBadgeColor(task.status)}>
                     {formatStatus(task.status)}
