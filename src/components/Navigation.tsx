@@ -92,7 +92,13 @@ const Navigation = () => {
     setNotifications(response);
   };
   useEffect(() => {
-    fetchNotifications();
+    fetchNotifications(); // Initial fetch
+  
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 60000); // Fetch every 60 seconds
+  
+    return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
 
   const unreadCount = notifications?.filter(n => !n.read).length;
