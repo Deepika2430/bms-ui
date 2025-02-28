@@ -32,7 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import NotificationItem from "./NotificationItem";
-import { getNotifications } from "@/services/notificationService";
+import { getNotifications, updateNotification } from "@/services/notificationService";
 
 // const demoNotifications: Notification[] = [
 //   {
@@ -86,25 +86,33 @@ const Navigation = () => {
   const [user, setUser] = useState<any>(null);
   const [notifications, setNotifications] = useState([]);
 
+  const fetchNotifications = async () => {
+    const response = await getNotifications();
+    console.log(response);
+    setNotifications(response);
+  };
   useEffect(() => {
-    const fetchNotifications = async () => {
-      const response = await getNotifications();
-      console.log(response);
-      setNotifications(response);
-    };
     fetchNotifications();
   }, []);
 
   const unreadCount = notifications?.filter(n => !n.read).length;
 
-  const handleMarkAsRead = (id: string) => {
+  const handleMarkAsRead = async (id: string) => {
     setNotifications(
       notifications.map(n => (n.id === id ? { ...n, read: true } : n))
     );
+    const response = await updateNotification(id);
+    console.log(response);
+    fetchNotifications();
   };
 
   const handleMarkAllAsRead = () => {
     setNotifications(notifications.map(n => ({ ...n, read: true })));
+    notifications.forEach(async n => {
+      const response = await updateNotification(n.id);
+      console.log(response);
+    });
+    fetchNotifications();
   };
 
   useEffect(() => {
