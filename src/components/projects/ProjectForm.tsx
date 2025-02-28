@@ -41,22 +41,22 @@ const projectSchema = z.object({
   projectCode: z.string().min(1, "Project code is required"),
   projectName: z.string().min(1, "Project name is required"),
   projectDescription: z.string().min(1, "Project description is required"),
-  plannedStartDate: z.number({
+  plannedStartDate: z.string({
     required_error: "Planned start date is required",
   }),
-  plannedEndDate: z.number({
-    required_error: "Planned end date is required"
+  plannedEndDate: z.string({
+    required_error: "Planned end date is required",
   }),
-  revisedPlannedEndDate: z.number().optional(),
-  actualStartDate: z.number().optional(),
-  actualEndDate: z.number().optional(),
+  revisedPlannedEndDate: z.string().optional(),
+  actualStartDate: z.string().optional(),
+  actualEndDate: z.string().optional(),
   contractedEfforts: z.string().optional(),
   plannedEfforts: z.string().optional(),
   poNumber: z.string().optional(),
   poAmount: z.string().optional(),
   currency: z.string().optional(),
-  poStartDate: z.number().optional(),
-  poEndDate: z.number().optional(),
+  poStartDate: z.string().optional(),
+  poEndDate: z.string().optional(),
   poValidity: z.string().optional(),
   poUpliftmentDetails: z.string().optional(),
   comments: z.string().optional(),
@@ -92,18 +92,32 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
       projectCode: initialData?.projectCode ?? "",
       projectName: initialData?.projectName ?? "",
       projectDescription: initialData?.projectDescription ?? "",
-      plannedStartDate: initialData?.plannedStartDate ? new Date(initialData.plannedStartDate).getTime() : null,
-      plannedEndDate: initialData?.plannedEndDate ? new Date(initialData.plannedEndDate).getTime() : null,
-      revisedPlannedEndDate: initialData?.revisedPlannedEndDate ? new Date(initialData.revisedPlannedEndDate).getTime() : null,
-      actualStartDate: initialData?.actualStartDate ? new Date(initialData.actualStartDate).getTime() : null,
-      actualEndDate: initialData?.actualEndDate ? new Date(initialData.actualEndDate).getTime() : null,
+      plannedStartDate: initialData?.plannedStartDate
+        ? new Date(initialData.plannedStartDate).getTime()
+        : null,
+      plannedEndDate: initialData?.plannedEndDate
+        ? new Date(initialData.plannedEndDate).getTime()
+        : null,
+      revisedPlannedEndDate: initialData?.revisedPlannedEndDate
+        ? new Date(initialData.revisedPlannedEndDate).getTime()
+        : null,
+      actualStartDate: initialData?.actualStartDate
+        ? new Date(initialData.actualStartDate).getTime()
+        : null,
+      actualEndDate: initialData?.actualEndDate
+        ? new Date(initialData.actualEndDate).getTime()
+        : null,
       contractedEfforts: initialData?.contractedEfforts ?? "",
       plannedEfforts: initialData?.plannedEfforts ?? "",
       poNumber: initialData?.poNumber ?? "",
       poAmount: initialData?.poAmount ?? "",
       currency: initialData?.currency ?? "",
-      poStartDate: initialData?.poStartDate ? new Date(initialData.poStartDate).getTime() : null,
-      poEndDate: initialData?.poEndDate ? new Date(initialData.poEndDate).getTime() : null,
+      poStartDate: initialData?.poStartDate
+        ? new Date(initialData.poStartDate).getTime()
+        : null,
+      poEndDate: initialData?.poEndDate
+        ? new Date(initialData.poEndDate).getTime()
+        : null,
       poValidity: initialData?.poValidity ?? "",
       poUpliftmentDetails: initialData?.poUpliftmentDetails ?? "",
       comments: initialData?.comments ?? "",
@@ -125,7 +139,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
 
   useEffect(() => {
     const fetchMasterData = async () => {
-      try{
+      try {
         setConsultants(await getConsultants());
         setDepartments(await getDepartments());
         setClients(await getClients());
@@ -138,7 +152,6 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
     };
 
     fetchMasterData();
-
   }, []);
 
   const currencies = [
@@ -173,7 +186,10 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
     <Card className="shadow-none border-none p-0">
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-8"
+          >
             <div className="border rounded-lg shadow-md">
               <div
                 className={`flex justify-between items-center cursor-pointer ${
@@ -259,91 +275,37 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                       )}
                     />
 
-                      <FormField
-                        control={form.control}
-                        name="plannedStartDate"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-col">
-                            <FormLabel>Planned Start Date*</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant="outline"
-                                    className={cn(
-                                      "border-2 shadow-md w-[300px] pl-3 text-left font-normal",
-                                      !field.value && "text-muted-foreground"
-                                    )}
-                                  >
-                                    {field.value ? (
-                                      format(new Date(field.value), "PPP")
-                                    ) : (
-                                      <span>Pick a date</span>
-                                    )}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                  mode="single"
-                                  selected={field.value ? new Date(field.value) : undefined}
-                                  onSelect={(date) => {
-                                    const selectedDate = Array.isArray(date) ? date[0] : date;
-                                    if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
-                                      field.onChange(selectedDate.getTime());
-                                    }
-                                  }}
-                                  disabled={(date) => date < new Date("1900-01-01")}
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                    <FormField
+                      control={form.control}
+                      name="plannedStartDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Planned Start Date*</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="date"
+                              className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                     <FormField
                       control={form.control}
                       name="plannedEndDate"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col">
+                        <FormItem>
                           <FormLabel>Planned End Date*</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  className={cn(
-                                    "border-2 shadow-md w-[300px] pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(new Date(field.value), "PPP")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={field.value ? new Date(field.value) : undefined}
-                                onSelect={(date) => {
-                                  const selectedDate = Array.isArray(date) ? date[0] : date;
-                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
-                                    field.onChange(selectedDate.getTime());
-                                  }
-                                }}
-                                disabled={(date) => date < new Date("1900-01-01")}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <FormControl>
+                            <Input
+                              type="date"
+                              className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              {...field}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -353,42 +315,15 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                       control={form.control}
                       name="revisedPlannedEndDate"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col">
+                        <FormItem>
                           <FormLabel>Revised Planned End Date</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  className={cn(
-                                    "border-2 shadow-md w-[300px] pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(new Date(field.value), "PPP")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={field.value ? new Date(field.value) : undefined}
-                                onSelect={(date) => {
-                                  const selectedDate = Array.isArray(date) ? date[0] : date;
-                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
-                                    field.onChange(selectedDate.getTime());
-                                  }
-                                }}
-                                disabled={(date) => date < new Date("1900-01-01")}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <FormControl>
+                            <Input
+                              type="date"
+                              className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              {...field}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -398,42 +333,15 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                       control={form.control}
                       name="actualStartDate"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col">
+                        <FormItem>
                           <FormLabel>Actual Start Date</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  className={cn(
-                                    "border-2 shadow-md w-[300px] pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(new Date(field.value), "PPP")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={field.value ? new Date(field.value) : undefined}
-                                onSelect={(date) => {
-                                  const selectedDate = Array.isArray(date) ? date[0] : date;
-                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
-                                    field.onChange(selectedDate.getTime());
-                                  }
-                                }}
-                                disabled={(date) => date < new Date("1900-01-01")}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <FormControl>
+                            <Input
+                              type="date"
+                              className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              {...field}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -443,42 +351,15 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                       control={form.control}
                       name="actualEndDate"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col">
+                        <FormItem>
                           <FormLabel>Actual End Date</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  className={cn(
-                                    "border-2 shadow-md w-[300px] pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(new Date(field.value), "PPP")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={field.value ? new Date(field.value) : undefined}
-                                onSelect={(date) => {
-                                  const selectedDate = Array.isArray(date) ? date[0] : date;
-                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
-                                    field.onChange(selectedDate.getTime());
-                                  }
-                                }}
-                                disabled={(date) => date < new Date("1900-01-01")}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <FormControl>
+                            <Input
+                              type="date"
+                              className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              {...field}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -575,42 +456,15 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                       control={form.control}
                       name="poStartDate"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col">
+                        <FormItem>
                           <FormLabel>PO Start Date</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  className={cn(
-                                    "border-2 shadow-md w-[300px] pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(new Date(field.value), "PPP")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={field.value ? new Date(field.value) : undefined}
-                                onSelect={(date) => {
-                                  const selectedDate = Array.isArray(date) ? date[0] : date;
-                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
-                                    field.onChange(selectedDate.getTime());
-                                  }
-                                }}
-                                disabled={(date) => date < new Date("1900-01-01")}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <FormControl>
+                            <Input 
+                              type="date" 
+                              className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              {...field} 
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -620,42 +474,15 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                       control={form.control}
                       name="poEndDate"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col">
+                        <FormItem>
                           <FormLabel>PO End Date</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  className={cn(
-                                    "border-2 shadow-md w-[300px] pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(new Date(field.value), "PPP")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={field.value ? new Date(field.value) : undefined}
-                                onSelect={(date) => {
-                                  const selectedDate = Array.isArray(date) ? date[0] : date;
-                                  if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
-                                    field.onChange(selectedDate.getTime());
-                                  }
-                                }}
-                                disabled={(date) => date < new Date("1900-01-01")}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                          <FormControl>
+                            <Input 
+                              type="date" 
+                              className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              {...field} 
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -707,15 +534,15 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                       control={form.control}
                       name="status"
                       render={({ field }) => (
-                        <FormItem className="space-y-3 flex-4">
+                        <FormItem className="space-y-3">
                           <FormLabel>Project Status*</FormLabel>
                           <FormControl>
                             <RadioGroup
                               onValueChange={field.onChange}
                               defaultValue={field.value}
-                              className="flex flex-col space-y-1"
+                              className="flex flex-row space-x-4"
                             >
-                              <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormItem className="flex items-center space-x-2 space-y-0">
                                 <FormControl>
                                   <RadioGroupItem value="active" />
                                 </FormControl>
@@ -723,7 +550,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                   Active
                                 </FormLabel>
                               </FormItem>
-                              <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormItem className="flex items-center space-x-2 space-y-0">
                                 <FormControl>
                                   <RadioGroupItem value="inactive" />
                                 </FormControl>
@@ -930,7 +757,11 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
               <Button type="button" variant="outline" onClick={onCancel}>
                 Cancel
               </Button>
-              <Button type="submit" className="bg-nav-accent text-white" onClick={form.handleSubmit(handleSubmit)}>
+              <Button
+                type="submit"
+                className="bg-nav-accent text-white"
+                onClick={form.handleSubmit(handleSubmit)}
+              >
                 {initialData ? "Update Project" : "Create Project"}
               </Button>
             </div>
