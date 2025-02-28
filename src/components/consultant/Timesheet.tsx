@@ -38,7 +38,9 @@ import {
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Clock, CalendarIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, CalendarIcon, CirclePlus } from "lucide-react";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
 
 const locales = { "en-US": enUS };
 
@@ -82,11 +84,17 @@ export default function Timesheet() {
   const [viewMode, setViewMode] = useState<View>("month");
 
   const handleSelectSlot = ({ start }: { start: Date }) => {
-    setSelectedDate(start);
-    setTask("");
-    setHours("");
-    setDescription("");
-    setEditingId(null);
+    // Check if the date is a weekend or not in current month
+    const isWeekend = start.getDay() === 0 || start.getDay() === 6;
+    const isCurrentMonth = start.getMonth() === new Date().getMonth();
+
+    if (!isWeekend && isCurrentMonth) {
+      setSelectedDate(start);
+      setTask("");
+      setHours("");
+      setDescription("");
+      setEditingId(null);
+    }
   };
 
   const handleSelectEvent = (event: TimesheetEvent) => {
@@ -257,12 +265,52 @@ export default function Timesheet() {
     );
   };
 
-  // Custom year view component to fix year view display
+  // Custom day cell component
+  const DayCell = ({ date }: { date: Date }) => {
+    const hasEntries = events.some(event =>
+      format(event.start, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+    );
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    const isCurrentMonth = date.getMonth() === new Date().getMonth();
+
+    if (isWeekend || !isCurrentMonth) {
+      return (
+        <div className="h-full w-full flex items-center justify-center opacity-50 bg-gray-50">
+          <span className="text-gray-400">{format(date, 'd')}</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="relative h-full w-full p-1">
+        <span>{format(date, 'd')}</span>
+        {!hasEntries && isCurrentMonth && (
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute bottom-0 right-0 h-6 w-6 p-1 hover:bg-indigo-100"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSelectSlot({ start: date });
+              }}
+            />
+            <CirclePlus className="h-4 w-4 text-blue-600 absolute left-1 top-1" />
+          </>
+        )}
+      </div>
+    );
+  };
+
+  // Update the customComponents object
   const customComponents = {
     event: EventComponent,
     toolbar: CustomToolbar,
     month: {
-      event: EventComponent
+      event: EventComponent,
+      dateHeader: (props: { date: Date }) => (
+        <DayCell date={props.date} />
+      )
     },
     year: {
       event: EventComponent
@@ -304,6 +352,21 @@ export default function Timesheet() {
             views={['month', 'year']}
             components={customComponents}
             className="timesheet-calendar"
+            firstDayOfWeek={1} // Start week from Monday
+            // Disable weekend and non-current month selection
+            dayPropGetter={(date) => {
+              const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+              const isCurrentMonth = date.getMonth() === new Date().getMonth();
+
+              return {
+                style: {
+                  backgroundColor: (isWeekend || !isCurrentMonth) ? '#f8fafc' : undefined,
+                  cursor: (isWeekend || !isCurrentMonth) ? 'not-allowed' : 'pointer',
+                  opacity: !isCurrentMonth ? '0.5' : '1'
+                },
+                className: (isWeekend || !isCurrentMonth) ? 'disabled-day' : undefined
+              };
+            }}
           />
         </div>
 
