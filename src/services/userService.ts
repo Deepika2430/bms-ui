@@ -13,11 +13,11 @@ export const getUserDetails = async () => {
         });
         const userDetails = (await response.json());
         return {
-            firstName: userDetails?.employee_details.first_name,
-            lastName: userDetails?.employee_details.last_name,
+            firstName: userDetails?.employee_details?.first_name ?? userDetails?.name,
+            lastName: userDetails?.employee_details?.last_name ?? "",
             role: userDetails?.role,
             id: userDetails?.id,
-            phone: userDetails?.employee_details.phone,
+            phone: userDetails?.employee_details?.phone ?? "",
             email: userDetails?.email,
             departmentName: userDetails?.departments?.name,
         }

@@ -109,11 +109,15 @@ const Navigation = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const response = await getUserDetails();
-      console.log(response);
-      setUser(response);
-    };
-    fetchUser();
+      try {
+        const response = await getUserDetails();
+        console.log(response, "testtt");
+        setUser(response);
+      } catch (error) {
+        console.error("Failed to fetch user details:", error);
+      }
+      }
+      fetchUser();
   }, []);
 
   useEffect(() => {

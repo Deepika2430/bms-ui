@@ -16,7 +16,7 @@ import { getToken, getRole } from "../services/authService";
 
 const AuthHandler = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!getToken());
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(getRole(getToken()));
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +32,7 @@ const AuthHandler = () => {
         navigate("/home", { replace: true });
       } else {
         setRole(null);
+        setIsAuthenticated(false);
       }
     };
 
