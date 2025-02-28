@@ -40,9 +40,26 @@ export const setAuthToken = (token: string) => {
   Cookies.set("authToken", token, { secure: true, sameSite: 'Strict', expires: 1 });
 };
 
-export const getToken = () => {
-    return Cookies.get("authToken");
-}
+export const getToken = (): string | null => {
+  const token = Cookies.get("authToken");
+  if (!token) return null;
+
+  try {
+    const decoded: { exp: number } = jwtDecode(token);
+    const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+
+    if (decoded.exp < currentTime) {
+      console.warn("Token has expired");
+      return null; // Token is expired
+    }
+
+    return token; // Token is valid
+  } catch (error) {
+    console.error("Invalid token:", error);
+    return null; // Token is invalid
+  }
+};
+
 
 export const clearAuthToken = () => {
   Cookies.remove("authToken");
