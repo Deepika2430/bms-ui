@@ -70,7 +70,7 @@ export const getRole = (token: string) => {
     role: string;
     user: string;
   }
-
-  const decodedToken = jwtDecode<DecodedToken>(token);
-  return decodedToken?.role;
+  if (!token)
+    return null;
+  return (jwtDecode<DecodedToken>(token)).role;
 }
