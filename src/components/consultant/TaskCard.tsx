@@ -65,8 +65,7 @@ const TaskCard = ({ task, assignee, onClick, className }: TaskCardProps) => {
         </div>
         
         <span className="text-xs text-muted-foreground">
-          {/* Created {format(new Date(task?.created_at), "MMM d")} */}
-          Created at {task?.created_at}
+          Created at {format(new Date(task?.created_at), "MMM d")}
         </span>
       </div>
     </div>
