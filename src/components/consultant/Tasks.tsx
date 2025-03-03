@@ -41,7 +41,6 @@ const TasksPage = () => {
 
   // Filter tasks based on search term and filters
   const filteredTasks = tasks?.filter((task) => {
-    task = task?.task;
     const matchesSearch =
       task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -53,16 +52,15 @@ const TasksPage = () => {
     return matchesSearch && matchesStatus && matchesPriority;
   });
 
-  console.log(filteredTasks, "filtered tasks");
   // Group tasks by status
   const pendingTasks = filteredTasks?.filter(
-    (task) => task.task.status === "open"
+    (task) => task.status === "open"
   );
   const inProgressTasks = filteredTasks?.filter(
-    (task) => task.task.status === "in_progress"
+    (task) => task.status === "in_progress"
   );
   const completedTasks = filteredTasks?.filter(
-    (task) => task.task.status === "completed"
+    (task) => task.status === "completed"
   );
 
   return (
@@ -146,9 +144,9 @@ const TasksPage = () => {
             {pendingTasks?.length > 0 ? (
               pendingTasks?.map((task) => (
                 <TaskCard
-                  key={task?.task?.id}
-                  task={task.task}
-                  assignee={task?.task?.assigned_by}
+                  key={task?.id}
+                  task={task}
+                  assignee={task?.assigned_by}
                 />
               ))
             ) : (
@@ -165,9 +163,9 @@ const TasksPage = () => {
             {inProgressTasks?.length > 0 ? (
               inProgressTasks?.map((task) => (
                 <TaskCard
-                  key={task?.task?.id}
-                  task={task.task}
-                  assignee={task?.task?.assigned_by}
+                  key={task?.id}
+                  task={task}
+                  assignee={task?.assigned_by}
                 />
               ))
             ) : (
