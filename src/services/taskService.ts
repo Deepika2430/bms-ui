@@ -175,9 +175,21 @@ export const getAssignedTasks = async () => {
         }
 
         const assignedTasks = await response.json();
-        return assignedTasks;
-    }   
+        return assignedTasks.map(task => ({
+            id: task.id,
+            taskTitle: task.title,
+            description: task.description,
+            startDate: task.start_date,
+            endDate: task.due_date,
+            status: task.status,
+            priority: task.priority,
+            estimatedHours: task.estimated_hours,
+            project: task.project?.project_name || "N/A",
+            projectId: task.project.id
+        }));
+    }
     catch (error) {
-        console.log(error);
+        console.error("Error fetching assigned tasks:", error);
+        throw error;
     }
 }

@@ -1,8 +1,8 @@
 import { Calendar, dateFnsLocalizer, View } from "react-big-calendar";
-import { format, parse, startOfWeek, getDay } from "date-fns";
+import { format, parse, startOfWeek, getDay, startOfMonth, endOfMonth } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -38,9 +38,12 @@ import {
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "react-toastify";
-import { ChevronLeft, ChevronRight, Clock, CalendarIcon, CirclePlus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, CalendarIcon, CirclePlus, CheckCircle, XCircle } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import { getAssignedTasks } from "@/services/taskService";
+import { getWorkLogs, addWorkLog, WorkLog, updateWorkLog } from "@/services/workLogsService";
+import React from "react";
 
 const locales = { "en-US": enUS };
 
@@ -52,18 +55,6 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-// Hardcoded task options with colors
-const TASK_OPTIONS = [
-  { value: "Development", label: "Development", color: "bg-violet-100 text-violet-800 border-violet-200" },
-  { value: "Testing", label: "Testing", color: "bg-emerald-100 text-emerald-800 border-emerald-200" },
-  { value: "Meeting", label: "Meeting", color: "bg-amber-100 text-amber-800 border-amber-200" },
-  { value: "Documentation", label: "Documentation", color: "bg-sky-100 text-sky-800 border-sky-200" },
-  { value: "Planning", label: "Planning", color: "bg-pink-100 text-pink-800 border-pink-200" },
-  { value: "Learning", label: "Learning", color: "bg-indigo-100 text-indigo-800 border-indigo-200" },
-  { value: "Code Review", label: "Code Review", color: "bg-orange-100 text-orange-800 border-orange-200" },
-  { value: "Design", label: "Design", color: "bg-teal-100 text-teal-800 border-teal-200" },
-];
-
 interface TimesheetEvent {
   id: string;
   title: string;
@@ -72,42 +63,165 @@ interface TimesheetEvent {
   task: string;
   hours: string;
   desc: string;
+  projectId: string;
+  status: 'pending' | 'approved' | 'rejected';
 }
 
 export default function Timesheet() {
   const [events, setEvents] = useState<TimesheetEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [task, setTask] = useState("");
+  const [selectedTaskId, setSelectedTaskId] = useState("");
   const [hours, setHours] = useState("");
   const [description, setDescription] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<View>("month");
+  const [assignedTasks, setAssignedTasks] = useState([]);
+  const [workLogs, setWorkLogs] = useState([]);
+  const [formData, setFormData] = useState({
+    taskId: '',
+    hours: 0,
+    description: ''
+  });
+  const [currentViewDate, setCurrentViewDate] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Add refresh interval reference
+  const refreshIntervalRef = React.useRef<NodeJS.Timeout>();
+
+  // Update useEffect to handle auto-refresh
+  useEffect(() => {
+    loadData(); // Initial load
+
+    // Set up refresh interval (every 5 minutes)
+    refreshIntervalRef.current = setInterval(() => {
+      loadData();
+    }, 5 * 60 * 1000);
+
+    // Cleanup interval on component unmount
+    return () => {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+      }
+    };
+  }, []); // Empty dependency array for initial setup only
+
+  // Add effect to reload data when month changes
+  useEffect(() => {
+    loadWorkLogs();
+  }, [currentViewDate]);
+
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const tasks = await getAssignedTasks();
+      console.log(tasks);
+      setAssignedTasks(tasks);
+      await loadWorkLogs();
+    } catch (error) {
+      console.error('Error loading assigned tasks:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadWorkLogs = async () => {
+    try {
+      const logs = await getWorkLogs();
+      setWorkLogs(logs);
+
+      // Get start and end of current view month
+      const monthStart = startOfMonth(currentViewDate);
+      const monthEnd = endOfMonth(currentViewDate);
+
+      const calendarEvents = logs
+        .map((log: any) => {
+          const workDate = new Date(log.work_date);
+          if (isNaN(workDate.getTime())) {
+            console.error('Invalid date:', log.work_date);
+            return null;
+          }
+
+          // Only include logs for the current view month
+          if (workDate < monthStart || workDate > monthEnd) {
+            return null;
+          }
+
+          const task = assignedTasks.find(t => t.id === log.task_id);
+
+          return {
+            id: log.id,
+            title: task?.taskTitle || 'Unknown Task',
+            start: workDate,
+            end: workDate,
+            task: log.task_id,
+            hours: log.hours_worked?.toString(),
+            desc: log.comments || '',
+            projectId: log.project_id,
+            status: log.status || 'pending'
+          };
+        })
+        .filter(Boolean);
+
+      setEvents(calendarEvents);
+    } catch (error) {
+      console.error('Error loading work logs:', error);
+      toast.error('Failed to load work logs');
+    }
+  };
 
   const handleSelectSlot = ({ start }: { start: Date }) => {
-    // Check if the date is a weekend or not in current month
     const isWeekend = start.getDay() === 0 || start.getDay() === 6;
-    const isCurrentMonth = start.getMonth() === new Date().getMonth();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const isFutureDate = start > today;
+    const isCurrentViewMonth = start.getMonth() === currentViewDate.getMonth() &&
+                             start.getFullYear() === currentViewDate.getFullYear();
 
-    if (!isWeekend && isCurrentMonth) {
+    if (!isWeekend && !isFutureDate && isCurrentViewMonth) {
       setSelectedDate(start);
-      setTask("");
+      setSelectedTaskId("");
       setHours("");
       setDescription("");
       setEditingId(null);
+    } else if (isFutureDate) {
+      toast.error("Cannot add entries for future dates");
+    } else if (!isCurrentViewMonth) {
+      toast.error("Can only add entries for the currently viewed month");
     }
   };
 
   const handleSelectEvent = (event: TimesheetEvent) => {
+    if (event.status === 'approved') {
+      // Show details in a toast or modal for approved entries
+      toast.info(
+        <div className="space-y-2">
+          <div className="font-semibold">{event.title}</div>
+          <div className="text-sm">Date: {format(event.start, "PPPP")}</div>
+          <div className="text-sm">Hours: {event.hours}</div>
+          {event.desc && <div className="text-sm">Comments: {event.desc}</div>}
+          <Badge variant="outline" className="bg-green-50 text-green-700">
+            Approved
+          </Badge>
+        </div>,
+        {
+          autoClose: 5000,
+          closeButton: true
+        }
+      );
+      return;
+    }
+
+    // Allow editing only for pending or rejected entries
     setSelectedDate(event.start);
-    setTask(event.task);
+    setSelectedTaskId(event.task);
     setHours(event.hours);
     setDescription(event.desc);
     setEditingId(event.id);
   };
 
-  const handleSaveEntry = () => {
-    if (!selectedDate || !task || !hours.trim() || !description.trim()) {
-      toast.error("Please fill in all fields");
+  const handleSaveEntry = async () => {
+    if (!selectedDate || !selectedTaskId || !hours.trim()) {
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -117,34 +231,54 @@ export default function Timesheet() {
       return;
     }
 
-    const newEvent: TimesheetEvent = {
-      id: editingId || crypto.randomUUID(),
-      title: `${task}: ${hours} hrs`,
-      start: selectedDate,
-      end: selectedDate,
-      task,
-      hours,
-      desc: description,
-    };
+    try {
+      // Find the selected task to get its project_id
+      const selectedTask = assignedTasks.find(task => task.id === selectedTaskId);
+      if (!selectedTask) {
+        toast.error("Selected task not found");
+        return;
+      }
 
-    if (editingId) {
-      // Editing existing entry
-      const updatedEvents = events.map(event =>
-        event.id === editingId ? newEvent : event
-      );
-      setEvents(updatedEvents);
-      toast.success("Timesheet entry updated");
-    } else {
-      // Adding new entry
-      setEvents([...events, newEvent]);
-      toast.success("Timesheet entry added");
+      // Set the time to noon in local timezone to avoid date shifting
+      const dateWithTime = new Date(selectedDate);
+      dateWithTime.setHours(12, 0, 0, 0);
+
+      const workLog: WorkLog = {
+        project_id: selectedTask.projectId,
+        task_id: selectedTaskId,
+        hours_worked: hourNum,
+        work_date: dateWithTime.toISOString(),
+        comments: description || undefined
+      };
+
+      if (editingId) {
+        // Update existing work log
+        await updateWorkLog(editingId, workLog);
+        toast.success("Timesheet entry updated successfully");
+      } else {
+        // Add new work log
+        await addWorkLog(workLog);
+        toast.success("Timesheet entry added successfully");
+      }
+
+      // Reset form before reloading data
+      setSelectedDate(null);
+      setSelectedTaskId("");
+      setHours("");
+      setDescription("");
+      setEditingId(null);
+      setFormData({
+        taskId: '',
+        hours: 0,
+        description: ''
+      });
+
+      // Reload the work logs to update the calendar
+      await loadWorkLogs();
+    } catch (error) {
+      console.error('Error saving work log:', error);
+      toast.error(editingId ? "Failed to update timesheet entry" : "Failed to save timesheet entry");
     }
-
-    setSelectedDate(null);
-    setTask("");
-    setHours("");
-    setDescription("");
-    setEditingId(null);
   };
 
   const handleViewChange = (view: View) => {
@@ -152,9 +286,11 @@ export default function Timesheet() {
   };
 
   // Get task color class
-  const getTaskColor = (taskName: string) => {
-    const taskOption = TASK_OPTIONS.find(opt => opt.value === taskName);
-    return taskOption?.color || "bg-gray-100 text-gray-800 border-gray-200";
+  const getTaskColor = (taskId: string) => {
+    const task = assignedTasks.find(t => t.id === taskId);
+    return task?.project
+      ? "bg-blue-100 text-blue-800 border-blue-200"
+      : "bg-gray-100 text-gray-800 border-gray-200";
   };
 
   // Custom toolbar component
@@ -228,6 +364,30 @@ export default function Timesheet() {
 
   // Custom event component
   const EventComponent = ({ event }: { event: TimesheetEvent }) => {
+    const task = assignedTasks.find(t => t.id === event.task);
+
+    const getStatusIcon = (status: string) => {
+      switch (status) {
+        case 'approved':
+          return <CheckCircle className="h-3 w-3 text-green-500" />;
+        case 'rejected':
+          return <XCircle className="h-3 w-3 text-red-500" />;
+        default:
+          return <Clock className="h-3 w-3 text-yellow-500" />;
+      }
+    };
+
+    const getStatusColor = (status: string) => {
+      switch (status) {
+        case 'approved':
+          return 'bg-green-50 text-green-700 border-green-100';
+        case 'rejected':
+          return 'bg-red-50 text-red-700 border-red-100';
+        default:
+          return getTaskColor(event.task);
+      }
+    };
+
     return (
       <TooltipProvider>
         <Tooltip>
@@ -235,29 +395,63 @@ export default function Timesheet() {
             <div
               className={cn(
                 "px-2 py-1 rounded-sm border text-sm max-w-full overflow-hidden whitespace-nowrap text-ellipsis transition-all",
-                getTaskColor(event.task)
+                getStatusColor(event.status),
+                event.status === 'approved' ? 'cursor-default' : 'cursor-pointer'
               )}
             >
-              <div className="font-medium flex items-center justify-between">
-                <span>{event.task}</span>
+              <div className="font-medium flex items-center justify-between gap-1">
+                <span>{task?.taskTitle || 'Unknown Task'}</span>
+                {getStatusIcon(event.status)}
               </div>
-              <div className="text-xs flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {event.hours} hrs
+              <div className="text-xs flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {event.hours} hrs
+                </div>
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-xs px-1 py-0 capitalize",
+                    event.status === 'approved' && "bg-green-50 text-green-700",
+                    event.status === 'rejected' && "bg-red-50 text-red-700",
+                    event.status === 'pending' && "bg-yellow-50 text-yellow-700"
+                  )}
+                >
+
+                </Badge>
               </div>
             </div>
           </TooltipTrigger>
           <TooltipContent className="p-4 max-w-xs bg-white border border-indigo-100 shadow-lg">
             <div>
               <div className="font-bold mb-1 flex items-center justify-between">
-                {event.task}
+                {task?.taskTitle || 'Unknown Task'}
+                <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700">
+                  {task?.project || 'Unknown Project'}
+                </Badge>
               </div>
               <div className="text-sm text-muted-foreground mb-2">
                 {format(event.start, "PPPP")} · {event.hours} hours
               </div>
-              <div className="text-sm mt-2 bg-gray-50 p-2 rounded-md border border-gray-100">
-                <p className="text-sm">{event.desc}</p>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "capitalize",
+                    event.status === 'approved' && "bg-green-50 text-green-700",
+                    event.status === 'rejected' && "bg-red-50 text-red-700",
+                    event.status === 'pending' && "bg-yellow-50 text-yellow-700"
+                  )}
+                >
+                  {getStatusIcon(event.status)}
+                  <span className="ml-1">{event.status}</span>
+                </Badge>
               </div>
+              {event.desc && (
+                <div className="text-sm mt-2 bg-gray-50 p-2 rounded-md border border-gray-100">
+                  <p className="text-sm">{event.desc}</p>
+                </div>
+              )}
             </div>
           </TooltipContent>
         </Tooltip>
@@ -267,36 +461,38 @@ export default function Timesheet() {
 
   // Custom day cell component
   const DayCell = ({ date }: { date: Date }) => {
-    const hasEntries = events.some(event =>
-      format(event.start, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
-    );
-    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-    const isCurrentMonth = date.getMonth() === new Date().getMonth();
+    const hasEntries = events.some(event => {
+      if (!event.start || !(date instanceof Date)) return false;
+      return format(event.start, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
+    });
 
-    if (isWeekend || !isCurrentMonth) {
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const isFutureDate = date > today;
+    const isCurrentViewMonth = date.getMonth() === currentViewDate.getMonth() &&
+                             date.getFullYear() === currentViewDate.getFullYear();
+
+    // Disable cell if it's a weekend, future date, or not in current view month
+    if (isWeekend || isFutureDate || !isCurrentViewMonth) {
       return (
         <div className="h-full w-full flex items-center justify-center opacity-50 bg-gray-50">
-          <span className="text-gray-400">{format(date, 'd')}</span>
+          <span className="text-gray-400">{date instanceof Date ? format(date, 'd') : ''}</span>
         </div>
       );
     }
 
     return (
-      <div className="relative h-full w-full p-1">
-        <span>{format(date, 'd')}</span>
-        {!hasEntries && isCurrentMonth && (
-          <>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute bottom-0 right-0 h-6 w-6 p-1 hover:bg-indigo-100"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleSelectSlot({ start: date });
-              }}
-            />
-            <CirclePlus className="h-4 w-4 text-blue-600 absolute left-1 top-1" />
-          </>
+      <div className="relative h-full w-full p-1 group">
+        <span>{date instanceof Date ? format(date, 'd') : ''}</span>
+        {!hasEntries && (
+          <CirclePlus
+            className="h-4 w-4 text-blue-600 absolute left-0 top-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelectSlot({ start: date });
+            }}
+          />
         )}
       </div>
     );
@@ -317,12 +513,23 @@ export default function Timesheet() {
     }
   };
 
+  const onNavigate = (newDate: Date) => {
+    setCurrentViewDate(newDate);
+  };
+
   return (
     <Card className="w-full shadow-lg animate-fade-in overflow-hidden border-indigo-100">
       <CardHeader className="pb-2 bg-gradient-to-r from-indigo-50 to-blue-50">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
           <div>
-            <CardTitle className="text-2xl font-bold tracking-tight text-indigo-900">Timesheet Calendar</CardTitle>
+            <CardTitle className="text-2xl font-bold tracking-tight text-indigo-900">
+              Timesheet Calendar
+              {isLoading && (
+                <span className="ml-2 inline-block animate-spin text-indigo-600">
+                  <Clock className="h-4 w-4" />
+                </span>
+              )}
+            </CardTitle>
             <CardDescription className="text-indigo-700">
               Track your work hours and activities
             </CardDescription>
@@ -353,18 +560,23 @@ export default function Timesheet() {
             components={customComponents}
             className="timesheet-calendar"
             firstDayOfWeek={1} // Start week from Monday
-            // Disable weekend and non-current month selection
+            onNavigate={onNavigate}
+            date={currentViewDate}
             dayPropGetter={(date) => {
               const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-              const isCurrentMonth = date.getMonth() === new Date().getMonth();
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              const isFutureDate = date > today;
+              const isCurrentViewMonth = date.getMonth() === currentViewDate.getMonth() &&
+                                       date.getFullYear() === currentViewDate.getFullYear();
 
               return {
                 style: {
-                  backgroundColor: (isWeekend || !isCurrentMonth) ? '#f8fafc' : undefined,
-                  cursor: (isWeekend || !isCurrentMonth) ? 'not-allowed' : 'pointer',
-                  opacity: !isCurrentMonth ? '0.5' : '1'
+                  backgroundColor: (isWeekend || isFutureDate || !isCurrentViewMonth) ? '#f8fafc' : undefined,
+                  cursor: (isWeekend || isFutureDate || !isCurrentViewMonth) ? 'not-allowed' : 'pointer',
+                  opacity: !isCurrentViewMonth ? '0.5' : '1'
                 },
-                className: (isWeekend || !isCurrentMonth) ? 'disabled-day' : undefined
+                className: (isWeekend || isFutureDate || !isCurrentViewMonth) ? 'disabled-day' : undefined
               };
             }}
           />
@@ -384,17 +596,22 @@ export default function Timesheet() {
 
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="task-type">Task Type</Label>
-                <Select value={task} onValueChange={setTask}>
-                  <SelectTrigger id="task-type">
-                    <SelectValue placeholder="Select a task type" />
+                <Label htmlFor="task">Task</Label>
+                <Select
+                  value={selectedTaskId}
+                  onValueChange={setSelectedTaskId}
+                  disabled={editingId && events.find(e => e.id === editingId)?.status === 'approved'}
+                >
+                  <SelectTrigger id="task">
+                    <SelectValue placeholder="Select a task" />
                   </SelectTrigger>
                   <SelectContent>
-                    {TASK_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
+                    {assignedTasks.map((task) => (
+                      <SelectItem key={task.id} value={task.id}>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className={cn("py-0.5 px-1.5", option.color)}>
-                            {option.label}
+                          <span className="font-medium">{task.taskTitle}</span>
+                          <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700">
+                            {task.project}
                           </Badge>
                         </div>
                       </SelectItem>
@@ -414,17 +631,19 @@ export default function Timesheet() {
                   placeholder="Hours worked"
                   value={hours}
                   onChange={(e) => setHours(e.target.value)}
+                  disabled={editingId && events.find(e => e.id === editingId)?.status === 'approved'}
                 />
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Comments</Label>
                 <Textarea
                   id="description"
                   placeholder="Describe what you worked on..."
                   rows={4}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  disabled={editingId && events.find(e => e.id === editingId)?.status === 'approved'}
                 />
               </div>
             </div>
@@ -434,9 +653,11 @@ export default function Timesheet() {
                 Close
               </Button>
 
-              <Button onClick={handleSaveEntry} className="ml-2 bg-indigo-600 hover:bg-indigo-700">
-                {editingId ? "Update Entry" : "Save Entry"}
-              </Button>
+              {(!editingId || events.find(e => e.id === editingId)?.status !== 'approved') && (
+                <Button onClick={handleSaveEntry} className="ml-2 bg-indigo-600 hover:bg-indigo-700">
+                  {editingId ? "Update Entry" : "Save Entry"}
+                </Button>
+              )}
             </DialogFooter>
           </DialogContent>
         </Dialog>
