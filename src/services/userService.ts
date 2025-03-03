@@ -1,5 +1,6 @@
 import config from "@/config";
 import { getToken } from "./authService";
+import { Department } from '@/types/employee';
 
 export const getUserDetails = async () => {
     const token = getToken();
@@ -18,8 +19,18 @@ export const getUserDetails = async () => {
             role: userDetails?.role,
             id: userDetails?.id,
             phone: userDetails?.employee_details?.phone ?? "",
-            email: userDetails?.email,
-            departmentName: userDetails?.departments?.name,
+            mobile: userDetails?.employee_details?.mobile ?? "",
+            dateOfBirth: userDetails?.employee_details?.date_of_birth ?? "",
+            email: userDetails?.email ?? "",
+            departmentName: userDetails?.departments?.name ?? "",   
+            designation: userDetails?.employee_details?.designation ?? "",
+            status: userDetails?.employee_details?.status ?? "",
+            department: userDetails?.employee_details?.departments?.name ?? "",
+            departmentId: userDetails?.employee_details?.department_id ?? "",
+            dateOfJoining: userDetails?.employee_details?.date_of_joining ?? "",
+            empId: userDetails?.employee_details?.emp_id ?? "",
+            createdAt: userDetails?.created_at ?? "",
+            updatedAt: userDetails?.employee_details?.updated_at ?? "",
         }
     }
     catch (error) {
