@@ -125,7 +125,6 @@ const Navigation = () => {
     const fetchUser = async () => {
       try {
         const response = await getUserDetails();
-        console.log(response, "testtt");
         setUser(response);
       } catch (error) {
         console.error("Failed to fetch user details:", error);
@@ -178,18 +177,18 @@ const Navigation = () => {
       icon: CheckSquare,
       allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
     },
-    {
-      path: "/reports",
-      label: "Reports",
-      icon: FileText,
-      allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
-    },
-    {
-      path: "/settings",
-      label: "Settings",
-      icon: Settings,
-      allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
-    },
+    // {
+    //   path: "/reports",
+    //   label: "Reports",
+    //   icon: FileText,
+    //   allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
+    // },
+    // {
+    //   path: "/settings",
+    //   label: "Settings",
+    //   icon: Settings,
+    //   allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
+    // },
     {
       path: "/timesheet",
       label: "Timesheet",

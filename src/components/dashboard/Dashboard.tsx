@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -14,18 +14,64 @@ import Analytics from "./Analytics";
 import Users from "./Users";
 import Settings from "./Settings";
 import { HomeIcon, BarChart3Icon, UsersIcon, SettingsIcon } from "lucide-react";
+import ConsultantDashboard from "@/components/consultant/Dashboard";
+import { getRole, getToken } from "@/services/authService";
 
 const Dashboard: React.FC = () => {
   const [search, setSearch] = useState("");
-  const [activeComponent, setActiveComponent] = useState(<DashboardContent />);
+  const [activeComponent, setActiveComponent] = useState<React.ReactNode>(null);
+  const [role, setRole] = useState<string>("consultant");
+
+  useEffect(() => {
+    const token = getToken();
+    if (token) {
+      const userRole = getRole(token) ?? "consultant";
+      setRole(userRole);
+      setActiveComponent(userRole === "admin" ? <DashboardContent /> : role === "manager" ? <ConsultantDashboard /> : role === "consultant" ? <ConsultantDashboard /> : <DashboardContent />);
+    }
+  }, []);
+
+  const sidebarLinks = [
+    {
+      name: "Dashboard",
+      icon: <HomeIcon size={20} />,
+      component: role === "admin" ? <DashboardContent /> : role === "manager" ? <ConsultantDashboard /> : role === "consultant" ? <ConsultantDashboard /> : <DashboardContent />,
+      allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
+    },
+    {
+      name: "Analytics",
+      icon: <BarChart3Icon size={20} />,
+      component: <Analytics />,
+      allowedRoles: ["admin", "manager",],
+    },
+    { name: "Users", icon: <UsersIcon size={20} />, component: <Users />,
+    allowedRoles: ["admin",], },
+    {
+      name: "Appearance",
+      icon: <SettingsIcon size={20} />,
+      component: <Settings />,
+      allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
+    },
+  ];
+
+  const hasPermission = (roles: string[]) => {
+    if (!role) {
+      return false;
+    }
+    return roles.includes(role);
+  };
+
+  const filteredSidebarItems = sidebarLinks.filter((item) =>
+    hasPermission(item.allowedRoles as any[])
+  );
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-white">
       {/* Sidebar */}
       <aside className="w-64 bg-white dark:bg-gray-800 shadow-md p-5">
-        <h1 className="text-2xl font-bold mb-6">📊 Admin Panel</h1>
+        <h1 className="text-1xl font-bold mb-6">📊 {role.charAt(0).toUpperCase() + role.substring(1).toLowerCase()}  Panel</h1>
         <nav>
-          {sidebarLinks.map((link) => (
+          {filteredSidebarItems.map((link) => (
             <button
               key={link.name}
               className="flex items-center w-full p-3 mb-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -68,64 +114,63 @@ const DashboardContent: React.FC = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-  {/* Bar Chart */}
-  <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md">
-    <h3 className="text-xl font-semibold mb-3">Projects Over Time</h3>
-    <ResponsiveContainer width="100%" height={250}>
-      <BarChart data={barChartData}>
-        <XAxis
-          dataKey="name"
-          stroke="currentColor"
-          className="text-gray-800 dark:text-gray-200"
-        />
-        <YAxis
-          stroke="currentColor"
-          className="text-gray-800 dark:text-gray-200"
-        />
-        <Tooltip
-          contentStyle={{
-            backgroundColor: "var(--tooltip-bg)",
-            border: "1px solid var(--tooltip-border)",
-          }}
-          itemStyle={{
-            color: "var(--tooltip-text)",
-          }}
-        />
-        <Bar dataKey="projects" fill="#4F46E5" />
-      </BarChart>
-    </ResponsiveContainer>
-  </div>
+        {/* Bar Chart */}
+        <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-3">Projects Over Time</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={barChartData}>
+              <XAxis
+                dataKey="name"
+                stroke="currentColor"
+                className="text-gray-800 dark:text-gray-200"
+              />
+              <YAxis
+                stroke="currentColor"
+                className="text-gray-800 dark:text-gray-200"
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--tooltip-bg)",
+                  border: "1px solid var(--tooltip-border)",
+                }}
+                itemStyle={{
+                  color: "var(--tooltip-text)",
+                }}
+              />
+              <Bar dataKey="projects" fill="#4F46E5" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
 
-  {/* Pie Chart */}
-  <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md">
-    <h3 className="text-xl font-semibold mb-3">Project Status</h3>
-    <ResponsiveContainer width="100%" height={250}>
-      <PieChart>
-        <Pie
-          data={pieChartData}
-          cx="50%"
-          cy="50%"
-          outerRadius={80}
-          dataKey="value"
-        >
-          {pieChartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={entry.color} />
-          ))}
-        </Pie>
-        <Tooltip
-          contentStyle={{
-            backgroundColor: "var(--tooltip-bg)",
-            border: "1px solid var(--tooltip-border)",
-          }}
-          itemStyle={{
-            color: "var(--tooltip-text)",
-          }}
-        />
-      </PieChart>
-    </ResponsiveContainer>
-  </div>
-</div>
-
+        {/* Pie Chart */}
+        <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-3">Project Status</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={pieChartData}
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                dataKey="value"
+              >
+                {pieChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--tooltip-bg)",
+                  border: "1px solid var(--tooltip-border)",
+                }}
+                itemStyle={{
+                  color: "var(--tooltip-text)",
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
 
       {/* Project Table */}
       <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md">
@@ -168,25 +213,6 @@ const DashboardContent: React.FC = () => {
     </>
   );
 };
-
-const sidebarLinks = [
-  {
-    name: "Dashboard",
-    icon: <HomeIcon size={20} />,
-    component: <DashboardContent />,
-  },
-  {
-    name: "Analytics",
-    icon: <BarChart3Icon size={20} />,
-    component: <Analytics />,
-  },
-  { name: "Users", icon: <UsersIcon size={20} />, component: <Users /> },
-  {
-    name: "Settings",
-    icon: <SettingsIcon size={20} />,
-    component: <Settings />,
-  },
-];
 
 const stats = [
   { title: "Active Projects", value: "24", color: "bg-blue-500" },
