@@ -10,6 +10,7 @@ import Timesheet from "./consultant/TimeSheet";
 import ConsultantTasks from "./consultant/Tasks";
 import Settings from "../pages/Settings";
 import BmsHome from "../pages/BmsHome";
+import Profile from "../pages/Profile";
 import AuthForm from "../components/AuthForm";
 import NotFound from "../pages/NotFound";
 import { getToken, getRole } from "../services/authService";
@@ -57,6 +58,7 @@ const AuthHandler = () => {
       {isAuthenticated ? (
         <Route path="/" element={<Layout />}>
           <Route path="home" element={<Index />} />
+          <Route path="profile" element={<Profile/>} />
           {role === "admin" && (
             <>
               <Route path="projects" element={<Projects />} />
