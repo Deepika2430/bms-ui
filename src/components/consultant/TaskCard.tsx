@@ -29,7 +29,7 @@ const TaskCard = ({ task, assignee, onClick, className }: TaskCardProps) => {
       onClick={onClick}
     >
       <div className="flex justify-between items-start mb-2">
-        <h3 className="font-medium text-base truncate">{task?.title}</h3>
+        <h3 className="font-medium text-base truncate">{task?.taskTitle}</h3>
         <StatusBadge status={task?.status} />
       </div>
       
@@ -41,17 +41,17 @@ const TaskCard = ({ task, assignee, onClick, className }: TaskCardProps) => {
         </span>
       </div>
       
-      {task.due_date && (
+      {task.endDate && (
         <div className="flex items-center text-xs text-muted-foreground gap-1 mb-1">
           <Calendar className="h-3.5 w-3.5" />
-          <span>Due: {format(new Date(task.due_date), "MMM d, yyyy")}</span>
+          <span>Due: {format(new Date(task.endDate), "MMM d, yyyy")}</span>
         </div>
       )}
       
-      {task.estimated_hours && (
+      {task.estimatedHours && (
         <div className="flex items-center text-xs text-muted-foreground gap-1 mb-3">
           <Clock className="h-3.5 w-3.5" />
-          <span>Est: {task.estimated_hours} hours</span>
+          <span>Est: {task.estimatedHours} hours</span>
         </div>
       )}
       
@@ -65,8 +65,8 @@ const TaskCard = ({ task, assignee, onClick, className }: TaskCardProps) => {
         </div>
         
         <span className="text-xs text-muted-foreground">
-          {/* Created at {format(new Date(task?.created_at), "MMM d")} */}
-          Created at {(task?.created_at)}
+          Created at {format(new Date(task?.createdAt), "MMM d")}
+          {/* Created at {(task?.createdAt)} */}
         </span>
       </div>
     </div>

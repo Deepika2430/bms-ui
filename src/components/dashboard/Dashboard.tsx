@@ -74,8 +74,8 @@ const Dashboard: React.FC = () => {
           {filteredSidebarItems.map((link) => (
             <button
               key={link.name}
-              className="flex items-center w-full p-3 mb-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"
               onClick={() => setActiveComponent(link.component)}
+              className={`flex items-center w-full p-3 mb-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 ${activeComponent === link.component ? "bg-gray-500 text-white" : ""}`}
             >
               {link.icon}
               <span className="ml-3">{link.name}</span>

@@ -2,7 +2,7 @@ import BmsDashboard from "@/components/dashboard/Dashboard";
 
 const Home = () => {
   return (
-    <div className="min-h-screen pt-32 px-4">
+    <div className="min-h-screen pt-32 px-3">
         <BmsDashboard />
       {/* <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-nav-foreground mb-6">Welcome</h1>

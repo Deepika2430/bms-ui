@@ -42,8 +42,8 @@ const TasksPage = () => {
   // Filter tasks based on search term and filters
   const filteredTasks = tasks?.filter((task) => {
     const matchesSearch =
-      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.description.toLowerCase().includes(searchTerm.toLowerCase());
+      task?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task?.description.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = statusFilter === "" || task.status === statusFilter;
     const matchesPriority =
@@ -146,7 +146,7 @@ const TasksPage = () => {
                 <TaskCard
                   key={task?.id}
                   task={task}
-                  assignee={task?.assigned_by}
+                  assignee={task?.assignedBy}
                 />
               ))
             ) : (
@@ -165,7 +165,7 @@ const TasksPage = () => {
                 <TaskCard
                   key={task?.id}
                   task={task}
-                  assignee={task?.assigned_by}
+                  assignee={task?.assignedBy}
                 />
               ))
             ) : (
@@ -184,7 +184,7 @@ const TasksPage = () => {
                 <TaskCard
                   key={task.id}
                   task={task}
-                  assignee={task?.assigned_by}
+                  assignee={task?.assignedBy}
                 />
               ))
             ) : (

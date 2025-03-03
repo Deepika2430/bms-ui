@@ -609,10 +609,10 @@ export default function Timesheet() {
                     {assignedTasks.map((task) => (
                       <SelectItem key={task.id} value={task.id}>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">{task.taskTitle}</span>
-                          <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700">
+                          <span className="font-medium">{task.taskTitle.substring(0, 25) + (task.taskTitle.length > 25 ? "..." : "")}</span>
+                          {/* <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700">
                             {task.project}
-                          </Badge>
+                          </Badge> */}
                         </div>
                       </SelectItem>
                     ))}

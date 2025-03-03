@@ -185,7 +185,9 @@ export const getAssignedTasks = async () => {
             priority: task.priority,
             estimatedHours: task.estimated_hours,
             project: task.project?.project_name || "N/A",
-            projectId: task.project.id
+            projectId: task.project.id,
+            assignedBy: task.assigned_by || "N/A",
+            createdAt: task.created_at,
         }));
     }
     catch (error) {
