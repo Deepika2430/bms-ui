@@ -65,7 +65,7 @@ const TaskForm = ({ projects, consultants, submitData, onCancel, initialData, re
       assignedUsers: initialData?.assignedUsers || [],
     },
   });
-
+  
   const selectedProject = form.watch("projectId");
 
   useEffect(() => {
@@ -84,7 +84,7 @@ const TaskForm = ({ projects, consultants, submitData, onCancel, initialData, re
         status: initialData.status,
         priority: initialData.priority,
         estimatedHours: initialData.estimatedHours,
-        assignedTo: initialData.assignedTo,
+        assignedTo: initialData.assignedUsers,
       });
     }
   }, [initialData, form]);
@@ -268,9 +268,9 @@ const TaskForm = ({ projects, consultants, submitData, onCancel, initialData, re
                     {initialData?.assignedUsers?.map((assignmentTo) => (
                       <div
                         key={assignmentTo.users.id}
-                        className="p-4 bg-gray-100 rounded-lg flex items-center shadow-sm transition duration-200 hover:bg-gray-200"
+                        className="p-3 bg-gray-100 rounded-lg flex items-center shadow-sm transition duration-200 hover:bg-gray-200"
                       >
-                        <span className="text-gray-700 font-medium">{assignmentTo.users?.name}</span>
+                        <span className="text-gray-700 font-medium">{(assignmentTo.users?.employee_details?.first_name + " " + assignmentTo?.users?.employee_details?.last_name) || assignmentTo?.users?.name}</span>
                       </div>
                     ))}
                   </div>
