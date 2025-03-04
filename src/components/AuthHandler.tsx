@@ -6,7 +6,7 @@ import Projects from "../pages/Projects";
 import Clients from "../pages/Clients";
 import Tasks from "../pages/Tasks";
 import ManagerTasks from "../components/managers/TaskList";
-import Timesheet from "./consultant/TimeSheet";
+import Timesheet from "../pages/TimeSheet";
 import ConsultantTasks from "./consultant/Tasks";
 import Settings from "../pages/Settings";
 import BmsHome from "../pages/BmsHome";
@@ -71,6 +71,7 @@ const AuthHandler = () => {
             <Route path="projects" element={<Projects />} />
               <Route path="tasks" element={<Tasks />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="/timesheet" element={<Timesheet />} />
             </>
           )}
           {role === "consultant" && (

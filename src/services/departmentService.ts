@@ -21,3 +21,22 @@ export const getDepartments = async () => {
         return error?.message;
     }
 }
+
+
+export const getDepartmentUsers = async () => {
+    const token = getToken();
+    try {
+        const response = await fetch(`${config.apiBaseUrl}/departments/users/`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            redirect: "follow"
+        });
+        const teamMembers = (await response.json());
+        return teamMembers;
+    }
+    catch (error) {
+        return error?.message;
+    }
+}
