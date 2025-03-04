@@ -13,6 +13,7 @@ import {
   LogOut,
   User,
   Bell,
+  Eye,
 } from "lucide-react";
 import { clearAuthToken } from "@/services/authService";
 import { getUserDetails } from "@/services/userService";
@@ -33,40 +34,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import NotificationItem from "./NotificationItem";
 import { getNotifications, updateNotification } from "@/services/notificationService";
-
-// const demoNotifications: Notification[] = [
-//   {
-//     id: "1",
-//     userId: "1",
-//     title: "New task assigned",
-//     message: "You have been assigned to 'Create project proposal' task",
-//     type: "task",
-//     referenceId: "task-1",
-//     createdAt: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
-//     read: false,
-//   },
-//   {
-//     id: "2",
-//     userId: "1",
-//     title: "Timesheet approved",
-//     message: "Your timesheet for last week has been approved",
-//     type: "timesheet",
-//     referenceId: "timesheet-1",
-//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-//     read: false,
-//   },
-//   {
-//     id: "3",
-//     userId: "1",
-//     title: "Project status updated",
-//     message: "Project 'Website Redesign' status changed to 'In Progress'",
-//     type: "project",
-//     referenceId: "project-1",
-//     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-//     read: true,
-//   },
-// ];
-
 
 interface NavLink {
   path: string;
@@ -177,25 +144,12 @@ const Navigation = () => {
       icon: CheckSquare,
       allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
     },
-    // {
-    //   path: "/reports",
-    //   label: "Reports",
-    //   icon: FileText,
-    //   allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
-    // },
-    // {
-    //   path: "/settings",
-    //   label: "Settings",
-    //   icon: Settings,
-    //   allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
-    // },
     {
       path: "/timesheet",
       label: "Timesheet",
       icon: Settings,
       allowedRoles: ["manager", "consultant", "associate-consultant"],
     },
-    // { path: "#", label: "Signout", icon: LogOut, action: handleSignout },
   ];
 
   const hasPermission = (roles: string[]) => {
@@ -256,15 +210,16 @@ const Navigation = () => {
                     <Button variant="ghost" size="icon" className="relative">
                       <Bell className="h-5 w-5" />
                       {unreadCount > 0 && (
-                        <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-white">
+                        <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
                           {unreadCount}
                         </span>
                       )}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-80 p-0" align="end">
-                    <div className="flex items-center justify-between p-3 border-b border-border">
+                    <div className="flex items-center justify-between p-3 border-b border-border bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                       <h3 className="font-medium">Notifications</h3>
+                      <Button variant="ghost" size="sm" className="text-xs h-8" onClick={()=> navigate("/notifications")}>View all</Button>
                       {unreadCount > 0 && (
                         <Button
                           variant="ghost"

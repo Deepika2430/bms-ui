@@ -14,6 +14,7 @@ import Profile from "../pages/Profile";
 import AuthForm from "../components/AuthForm";
 import NotFound from "../pages/NotFound";
 import { getToken, getRole } from "../services/authService";
+import NotificationsHistory from "./NotificationHistory";
 
 const AuthHandler = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!getToken());
@@ -59,6 +60,7 @@ const AuthHandler = () => {
         <Route path="/" element={<Layout />}>
           <Route path="home" element={<Index />} />
           <Route path="profile" element={<Profile/>} />
+          <Route path="notifications" element={<NotificationsHistory/>} />
           {role === "admin" && (
             <>
               <Route path="projects" element={<Projects />} />
