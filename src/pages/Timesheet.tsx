@@ -2,7 +2,7 @@ import { Calendar, dateFnsLocalizer, View } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay, startOfMonth, endOfMonth } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -42,7 +42,7 @@ import { ChevronLeft, ChevronRight, Clock, CalendarIcon, CirclePlus, CheckCircle
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { getAssignedTasks } from "@/services/taskService";
-import { getWorkLogs, addWorkLog, WorkLog, updateWorkLogStatus, getConsultantWorkLogs } from "@/services/workLogsService";
+import { getWorkLogs, addWorkLog, WorkLog, updateWorkLogStatus, getConsultantWorkLogs, updateWorkLog } from "@/services/workLogsService";
 import { getDepartmentUsers } from "@/services/departmentService";
 import Cookie from "js-cookie";
 import React from "react";
@@ -61,7 +61,14 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { getUserRoleFromToken } from "@/utils/decodeToken";
-import { createNotification, sendNotification } from "@/services/notificationService";
+import { createNotification } from "@/services/notificationService";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+} from "@/components/ui/alert-dialog";
 
 const locales = { "en-US": enUS };
 
@@ -167,6 +174,16 @@ export default function Timesheet() {
   // Add new state for all worklogs
   const [allConsultantWorkLogs, setAllConsultantWorkLogs] = useState<ConsultantWorkLog[]>([]);
 
+  // Add new state for alert dialog
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
+  const [approvedEventDetails, setApprovedEventDetails] = useState<TimesheetEvent | null>(null);
+
+  // First, add a new state to track if we're in a transition
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // First, add a ref for the calendar container
+  const calendarRef = useRef<HTMLDivElement>(null);
+
   // Update useEffect to handle auto-refresh
   useEffect(() => {
     loadData(); // Initial load
@@ -206,7 +223,6 @@ export default function Timesheet() {
     setIsLoading(true);
     try {
       const tasks = await getAssignedTasks();
-      console.log(tasks);
       setAssignedTasks(tasks);
       await loadWorkLogs();
 
@@ -227,7 +243,6 @@ export default function Timesheet() {
       setDepartmentData(response);
     } catch (error) {
       console.error('Error loading team members:', error);
-      toast.error('Failed to load team members');
     }
   };
 
@@ -243,7 +258,6 @@ export default function Timesheet() {
       filterAndSetConsultantEvents(logs, currentViewDate);
     } catch (error) {
       console.error('Error loading consultant work logs:', error);
-      toast.error('Failed to load consultant work logs');
     }
   };
 
@@ -319,7 +333,6 @@ export default function Timesheet() {
       setPersonalEvents(calendarEvents);
     } catch (error) {
       console.error('Error loading work logs:', error);
-      toast.error('Failed to load work logs');
     }
   };
 
@@ -338,32 +351,32 @@ export default function Timesheet() {
       setDescription("");
       setEditingId(null);
     } else if (isFutureDate) {
-      toast.error("Cannot add entries for future dates");
+      console.error("Cannot add entries for future dates");
     } else if (!isCurrentViewMonth) {
-      toast.error("Can only add entries for the currently viewed month");
+      console.error("Can only add entries for the currently viewed month");
     }
   };
 
   const handleSelectEvent = (event: TimesheetEvent) => {
-    if (event.status === 'approved') {
-      // Show details in a toast or modal for approved entries
-      toast.info(
-        <div className="space-y-2">
-          <div className="font-semibold">{event.title}</div>
-          <div className="text-sm">Date: {format(event.start, "PPPP")}</div>
-          <div className="text-sm">Hours: {event.hours}</div>
-          {event.desc && <div className="text-sm">Comments: {event.desc}</div>}
-          <Badge variant="outline" className="bg-green-50 text-green-700">
-            Approved
-          </Badge>
-        </div>,
-        {
-          autoClose: 5000,
-          closeButton: true
-        }
-      );
-      return;
-    }
+    // if (event.status === 'approved') {
+    //   // Show details in a toast or modal for approved entries
+    //   toast.info(
+    //     <div className="space-y-2">
+    //       <div className="font-semibold">{event.title}</div>
+    //       <div className="text-sm">Date: {format(event.start, "PPPP")}</div>
+    //       <div className="text-sm">Hours: {event.hours}</div>
+    //       {event.desc && <div className="text-sm">Comments: {event.desc}</div>}
+    //       <Badge variant="outline" className="bg-green-50 text-green-700">
+    //         Approved
+    //       </Badge>
+    //     </div>,
+    //     {
+    //       autoClose: 5000,
+    //       closeButton: true
+    //     }
+    //   );
+    //   return;
+    // }
 
     // Allow editing only for pending or rejected entries
     setSelectedDate(event.start);
@@ -404,10 +417,11 @@ export default function Timesheet() {
         work_date: dateWithTime.toISOString(),
         notes: description || undefined
       };
-
+      console.log(workLog);
+      console.log(description);
       if (editingId) {
         // Update existing work log
-        await updateWorkLogStatus(editingId, workLog);
+        await updateWorkLog(editingId, workLog);
         toast.success("Timesheet entry updated successfully");
       } else {
         // Add new work log
@@ -596,7 +610,7 @@ export default function Timesheet() {
       );
     }
 
-    // For non-managers, show full view
+    // For non-managers
     return (
       <TooltipProvider>
         <Tooltip>
@@ -605,8 +619,9 @@ export default function Timesheet() {
               className={cn(
                 "px-2 py-1 rounded-sm border text-sm max-w-full overflow-hidden whitespace-nowrap text-ellipsis transition-all",
                 getTaskColor(event.task),
-                event.status === 'approved' ? 'cursor-default' : 'cursor-pointer'
+                "cursor-pointer" // Always make it clickable for non-managers
               )}
+              onClick={() => handleEventClick(event)} // Add click handler here
             >
               <div className="font-medium flex items-center justify-between gap-1">
                 <span>{task?.taskTitle || 'Unknown Task'}</span>
@@ -759,10 +774,62 @@ export default function Timesheet() {
 
   // Update the handleEventClick function
   const handleEventClick = (event: TimesheetEvent) => {
-    if (!isManager) return;
-    setSelectedEventDetails(event);
-    setShowDetailsDialog(true);
+    if (isTransitioning) return;
+
+    // Clear any existing dialogs first
+    setShowAlertDialog(false);
+    setShowDetailsDialog(false);
+    setSelectedEventDetails(null);
+    setApprovedEventDetails(null);
+
+    // Small delay before showing new dialog
+    setTimeout(() => {
+      if (!isManager) {
+        if (event.status === 'approved') {
+          setApprovedEventDetails(event);
+          setShowAlertDialog(true);
+        }
+      } else {
+        setSelectedEventDetails(event);
+        setShowDetailsDialog(true);
+      }
+    }, 50);
   };
+
+  // Update the dialog close handler
+  const handleCloseDialog = async () => {
+    setIsTransitioning(true);
+    try {
+      // First close the dialog
+      setShowAlertDialog(false);
+      // Clear the event details
+      setApprovedEventDetails(null);
+      // Small delay to allow dialog to close
+      await new Promise(resolve => setTimeout(resolve, 50));
+      // Return focus to calendar container
+      if (calendarRef.current) {
+        calendarRef.current.focus();
+      }
+    } catch (error) {
+      console.error('Error closing dialog:', error);
+    } finally {
+      setIsTransitioning(false);
+    }
+  };
+
+  // Add this useEffect for cleanup
+  useEffect(() => {
+    return () => {
+      setIsTransitioning(true);
+      setShowAlertDialog(false);
+      setApprovedEventDetails(null);
+      setSelectedEventDetails(null);
+      setShowDetailsDialog(false);
+      // Return focus to body
+      document.body.focus();
+      setIsTransitioning(false);
+    };
+  }, []); // Empty dependency array means this runs on unmount
 
   return (
     <Card className=" pt-14 w-full shadow-lg animate-fade-in overflow-hidden border-gray-700">
@@ -782,7 +849,10 @@ export default function Timesheet() {
             </CardDescription>
           </div>
           <Button
-            onClick={() => setSelectedDate(new Date())}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelectSlot({ start: new Date(Date.now()) });
+            }}
             className="group self-start sm:self-center bg-indigo-600 hover:bg-indigo-700"
           >
             <CalendarIcon className="mr-2 h-4 w-4 group-hover:animate-pulse" />
@@ -805,7 +875,11 @@ export default function Timesheet() {
             </TabsList>
 
             <TabsContent value="personal" className="mt-0">
-              <div className="bg-white rounded-lg overflow-hidden border transition-all duration-300 hover:shadow-md border-indigo-100">
+              <div
+                ref={calendarRef}
+                tabIndex={-1} // Make it focusable but not in tab order
+                className="bg-white rounded-lg overflow-hidden border transition-all duration-300 hover:shadow-md border-indigo-100"
+              >
                 <Calendar
                   localizer={localizer}
                   events={personalEvents}
@@ -814,7 +888,7 @@ export default function Timesheet() {
                   style={{ height: 600 }}
                   selectable
                   onSelectSlot={handleSelectSlot}
-                  onSelectEvent={handleSelectEvent}
+                  onSelectEvent={handleEventClick}
                   view={viewMode}
                   onView={handleViewChange}
                   views={['month', 'year']}
@@ -889,7 +963,11 @@ export default function Timesheet() {
             </TabsContent>
           </Tabs>
         ) : (
-          <div className="bg-white rounded-lg overflow-hidden border transition-all duration-300 hover:shadow-md border-indigo-100">
+          <div
+            ref={calendarRef}
+            tabIndex={-1} // Make it focusable but not in tab order
+            className="bg-white rounded-lg overflow-hidden border transition-all duration-300 hover:shadow-md border-indigo-100"
+          >
             <Calendar
               localizer={localizer}
               events={personalEvents}
@@ -898,7 +976,7 @@ export default function Timesheet() {
               style={{ height: 600 }}
               selectable
               onSelectSlot={handleSelectSlot}
-              onSelectEvent={handleSelectEvent}
+              onSelectEvent={handleEventClick}
               view={viewMode}
               onView={handleViewChange}
               views={['month', 'year']}
@@ -965,7 +1043,7 @@ export default function Timesheet() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="description">Comments</Label>
+                <Label htmlFor="description">Notes</Label>
                 <Textarea
                   id="description"
                   placeholder="Describe what you worked on..."
@@ -1133,6 +1211,102 @@ export default function Timesheet() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Alert Dialog */}
+        <AlertDialog
+          open={showAlertDialog}
+          onOpenChange={(open) => {
+            if (!open) {
+              handleCloseDialog();
+            }
+          }}
+        >
+          <AlertDialogContent
+            className="sm:max-w-md"
+            onOpenAutoFocus={(e) => {
+              e.preventDefault();
+              // Focus the close button by default
+              const closeButton = e.currentTarget.querySelector('button[type="button"]');
+              if (closeButton instanceof HTMLElement) {
+                closeButton.focus();
+              }
+            }}
+            onCloseAutoFocus={(e) => {
+              e.preventDefault();
+              // Return focus to calendar container
+              if (calendarRef.current) {
+                calendarRef.current.focus();
+              }
+            }}
+          >
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-xl">Approved Timesheet Entry</AlertDialogTitle>
+              <AlertDialogDescription>
+                This timesheet entry has been approved and cannot be modified.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <div className="flex flex-col gap-4">
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label>Task</Label>
+                  <div className="p-2 border rounded-md bg-muted">
+                    <div className="font-medium">{approvedEventDetails?.title}</div>
+                    {approvedEventDetails?.desc && (
+                      <div className="text-sm text-gray-600 mt-1">
+                        {approvedEventDetails.desc}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label>Work Date</Label>
+                  <div className="p-2 border rounded-md bg-muted">
+                    {approvedEventDetails?.start ? format(approvedEventDetails.start, "PPPP") : ""}
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label>Hours Worked</Label>
+                  <div className="p-2 border rounded-md bg-muted">
+                    {approvedEventDetails?.hours} hrs
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label>Notes</Label>
+                  <div className="p-2 border rounded-md bg-muted whitespace-pre-wrap">
+                    {approvedEventDetails?.desc || 'No notes provided'}
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label>Status</Label>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="outline"
+                      className="bg-green-50 text-green-700"
+                    >
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Approved
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <Button
+                variant="outline"
+                onClick={handleCloseDialog}
+                disabled={isTransitioning}
+              >
+                Close
+              </Button>
+            </div>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );
