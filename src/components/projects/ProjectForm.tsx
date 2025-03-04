@@ -103,7 +103,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
       poAmount: initialData?.poAmount ?? "",
       currency: initialData?.currency ?? "",
       poStartDate: initialData?.poStartDate ? format(new Date(initialData?.poStartDate), "yyyy-MM-dd") : null,
-      poEndDate: initialData.poEndDate ? format(new Date(initialData?.poEndDate), "yyyy-MM-dd") : null,
+      poEndDate: initialData?.poEndDate ? format(new Date(initialData?.poEndDate), "yyyy-MM-dd") : null,
       poValidity: initialData?.poValidity ?? "",
       poUpliftmentDetails: initialData?.poUpliftmentDetails ?? "",
       comments: initialData?.comments ?? "",
