@@ -7,7 +7,8 @@ export interface WorkLog {
     hours_worked: number;
     work_date: string;
     notes?: string;
-    rejection_reason?: string;
+    status?: string;
+    comments?: string;
 }
 
 export interface TeamWorkLog extends WorkLog {
@@ -41,34 +42,8 @@ export const getWorkLogs = async () => {
         throw error;
     }
 };
-
-// export const getTeamWorkLogs = async (userId: string = 'all') => {
-//     const token = getToken();
-//     try {
-//         const url = userId === 'all'
-//             ? `${config.apiBaseUrl}/work-logs/team`
-//             : `${config.apiBaseUrl}/work-logs/team/${userId}`;
-
-//         const response = await fetch(url, {
-//             method: "GET",
-//             headers: {
-//                 "Authorization": `Bearer ${token}`,
-//                 "Content-Type": "application/json"
-//             }
-//         });
-
-//         if (!response.ok) {
-//             throw new Error(`HTTP error! status: ${response.status}`);
-//         }
-
-//         return await response.json();
-//     } catch (error) {
-//         console.error("Error fetching team work logs:", error);
-//         throw error;
-//     }
-// };
-
 export const addWorkLog = async (workLog: WorkLog) => {
+    console.log(JSON.stringify(workLog));
     const token = getToken();
     try {
         const response = await fetch(`${config.apiBaseUrl}/work-logs`, {
@@ -87,6 +62,28 @@ export const addWorkLog = async (workLog: WorkLog) => {
         return await response.json();
     } catch (error) {
         console.error("Error adding work log:", error);
+        throw error;
+    }
+};
+
+export const updateWorkLog = async (workLogId: string, workLog: WorkLog): Promise<any> => {
+    try {
+        const response = await fetch(`${config.apiBaseUrl}/work-logs/${workLogId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({status: "pending", ...workLog})
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update work log');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error updating work log:', error);
         throw error;
     }
 };
