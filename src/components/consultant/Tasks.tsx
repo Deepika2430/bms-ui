@@ -64,10 +64,10 @@ const TasksPage = () => {
   );
 
   return (
-    <div className="space-y-6 page-transition p-8">
+    <div className="space-y-6 page-transition p-8 bg-white dark:bg-gray-900 dark:text-white">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-10">
         <div>
-          <h1 className="font-semibold">Tasks</h1>
+          <h1 className="font-semibold text-2xl">Tasks</h1>
           <p className="text-muted-foreground">
             {filteredTasks?.length} tasks found
           </p>

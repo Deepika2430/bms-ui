@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { Task, User } from "@/lib/types";
 import { format } from "date-fns";
@@ -23,7 +22,7 @@ const TaskCard = ({ task, assignee, onClick, className }: TaskCardProps) => {
   return (
     <div 
       className={cn(
-        "bg-white dark:bg-card rounded-lg shadow-sm border border-border p-4 card-hover cursor-pointer",
+        "bg-white text-gray-800 shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer",
         className
       )}
       onClick={onClick}
@@ -66,7 +65,6 @@ const TaskCard = ({ task, assignee, onClick, className }: TaskCardProps) => {
         
         <span className="text-xs text-muted-foreground">
           Created at {format(new Date(task?.createdAt), "MMM d")}
-          {/* Created at {(task?.createdAt)} */}
         </span>
       </div>
     </div>
