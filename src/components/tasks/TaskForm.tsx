@@ -104,11 +104,6 @@ const TaskForm = ({ projects, consultants, submitData, onCancel, initialData, re
 
   return (
     <Card className="shadow-lg">
-      <CardHeader className="bg-nav-accent text-white">
-        <CardTitle>
-          {readOnly ? 'Task Details' : initialData ? 'Edit Task' : 'Create Task'}
-        </CardTitle>
-      </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">

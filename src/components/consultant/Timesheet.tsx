@@ -394,7 +394,7 @@ export default function Timesheet() {
           <TooltipTrigger asChild>
             <div
               className={cn(
-                "px-2 py-1 rounded-sm border text-sm max-w-full overflow-hidden whitespace-nowrap text-ellipsis transition-all",
+                "bg-red-500 px-2 py-1 rounded-sm border text-sm max-w-full overflow-hidden whitespace-nowrap text-ellipsis transition-all",
                 getStatusColor(event.status),
                 event.status === 'approved' ? 'cursor-default' : 'cursor-pointer'
               )}

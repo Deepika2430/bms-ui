@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Edit, Search } from "lucide-react";
 import { useState } from "react";
+import { format } from "date-fns";
 
 interface ProjectTableProps {
   projects: any[];
@@ -61,8 +62,8 @@ const ProjectTable = ({ projects, onEdit, onView }: ProjectTableProps) => {
                 <TableCell className="font-medium">{project.projectCode}</TableCell>
                 <TableCell>{project.projectName}</TableCell>
                 <TableCell>{project.client}</TableCell>
-                <TableCell>{project.startDate}</TableCell>
-                <TableCell>{project.endDate}</TableCell>
+                <TableCell>{format(new Date(project.poStartDate), "MMM d, yyyy")}</TableCell>
+                <TableCell>{format(new Date(project.poEndDate), "MMM d, yyyy")}</TableCell>
                 <TableCell>{project.status}</TableCell>
                 <TableCell>
                   <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(project); }}>

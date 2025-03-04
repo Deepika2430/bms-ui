@@ -7,7 +7,7 @@ const Layout = () => {
       <ThemeProvider>
     <div className="app-layout">
         <Navigation />
-        <main className="content">
+        <main className="content pb-0">
           <Outlet />
         </main>
     </div>

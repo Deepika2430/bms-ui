@@ -92,32 +92,18 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
       projectCode: initialData?.projectCode ?? "",
       projectName: initialData?.projectName ?? "",
       projectDescription: initialData?.projectDescription ?? "",
-      plannedStartDate: initialData?.plannedStartDate
-        ? new Date(initialData.plannedStartDate).getTime()
-        : null,
-      plannedEndDate: initialData?.plannedEndDate
-        ? new Date(initialData.plannedEndDate).getTime()
-        : null,
-      revisedPlannedEndDate: initialData?.revisedPlannedEndDate
-        ? new Date(initialData.revisedPlannedEndDate).getTime()
-        : null,
-      actualStartDate: initialData?.actualStartDate
-        ? new Date(initialData.actualStartDate).getTime()
-        : null,
-      actualEndDate: initialData?.actualEndDate
-        ? new Date(initialData.actualEndDate).getTime()
-        : null,
+      plannedStartDate: initialData?.plannedStartDate ? format(new Date(initialData?.plannedStartDate), "yyyy-MM-dd") : null,
+      plannedEndDate: initialData?.plannedEndDate ? format(new Date(initialData?.plannedEndDate), "yyyy-MM-dd") : null,
+      revisedPlannedEndDate: initialData?.revisedPlannedEndDate ? format(new Date(initialData?.revisedPlannedEndDate), "yyyy-MM-dd") : null,
+      actualStartDate: initialData?.actualStartDate ? format(new Date(initialData?.actualStartDate), "yyyy-MM-dd") : null,
+      actualEndDate: initialData?.actualEndDate ? format(new Date(initialData?.actualEndDate), "yyyy-MM-dd") : null,
       contractedEfforts: initialData?.contractedEfforts ?? "",
       plannedEfforts: initialData?.plannedEfforts ?? "",
       poNumber: initialData?.poNumber ?? "",
       poAmount: initialData?.poAmount ?? "",
       currency: initialData?.currency ?? "",
-      poStartDate: initialData?.poStartDate
-        ? new Date(initialData.poStartDate).getTime()
-        : null,
-      poEndDate: initialData?.poEndDate
-        ? new Date(initialData.poEndDate).getTime()
-        : null,
+      poStartDate: initialData?.poStartDate ? format(new Date(initialData?.poStartDate), "yyyy-MM-dd") : null,
+      poEndDate: initialData.poEndDate ? format(new Date(initialData?.poEndDate), "yyyy-MM-dd") : null,
       poValidity: initialData?.poValidity ?? "",
       poUpliftmentDetails: initialData?.poUpliftmentDetails ?? "",
       comments: initialData?.comments ?? "",

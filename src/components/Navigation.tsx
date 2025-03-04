@@ -193,7 +193,7 @@ const Navigation = () => {
       path: "/timesheet",
       label: "Timesheet",
       icon: Settings,
-      allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
+      allowedRoles: ["manager", "consultant", "associate-consultant"],
     },
     // { path: "#", label: "Signout", icon: LogOut, action: handleSignout },
   ];
