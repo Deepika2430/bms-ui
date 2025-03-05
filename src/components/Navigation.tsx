@@ -15,7 +15,7 @@ import {
   Bell,
   Eye,
 } from "lucide-react";
-import { clearAuthToken } from "@/services/authService";
+import { clearAuthToken, getRole } from "@/services/authService";
 import { getUserDetails } from "@/services/userService";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,6 +52,7 @@ const Navigation = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [notifications, setNotifications] = useState([]);
+  const [isAuthorized, setIsAuthorized] = useState(null);
 
   const fetchNotifications = async () => {
     const response = await getNotifications();
@@ -93,7 +94,10 @@ const Navigation = () => {
       try {
         const response = await getUserDetails();
         setUser(response);
+        setIsAuthorized(true);
       } catch (error) {
+        setUser(null);
+        setIsAuthorized(false);
         console.error("Failed to fetch user details:", error);
       }
       }
@@ -156,12 +160,20 @@ const Navigation = () => {
     if (!user) {
       return false;
     }
-    return roles.includes(user.role);
+    return roles.includes(user.role ?? getRole(getToken()));
   };
 
   const filteredNavItems = links.filter((item) =>
     hasPermission(item.allowedRoles as any[])
   );
+
+  if (isAuthorized === false) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-white">
+        <h1 className="text-2xl font-bold">Unauthorized</h1>
+      </div>
+    );
+  }
 
   return (
     <header

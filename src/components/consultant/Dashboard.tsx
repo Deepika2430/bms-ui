@@ -286,11 +286,10 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-6 page-transition">
+    <div className="space-y-6 page-transition overflow-y-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-semibold text-4xl">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, {user?.firstName+" "+user?.lastName}</p>
+          {/* <p className="text-muted-foreground text-2xl">Welcome back, {user?.firstName+" "+user?.lastName}</p> */}
         </div>
       </div>
 
