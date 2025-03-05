@@ -48,10 +48,15 @@ export const getAllUsers = async () => {
             redirect: "follow"
         });
         const users = (await response.json());
-        return users;
+        if (response.status !== 200) {
+            throw new Error(users?.error);
+        } else {
+        return users; 
+        }
     }
     catch (error) {
-        return error?.message;
+        throw error?.message;
+        // return error?.message;
     }
 }
 

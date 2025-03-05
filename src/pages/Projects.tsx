@@ -59,12 +59,18 @@ const Projects = () => {
   };
 
   const refreshProjects = async () => {
-    const response = await getProjects();
-    setProjects(response);
+    try {
+      const response = await getProjects();
+      setProjects(response);
+    } catch (error){
+      console.error("Error fetching projects:", error);
+      setProjects([]);
+      toast.error("Failed to load projects");
+    }
   };
 
   return (
-    <div className="min-h-screen pt-32 px-4 bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen pt-20 px-4 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         <Card className="shadow-lg">
           <CardHeader className="bg-nav-accent text-white">

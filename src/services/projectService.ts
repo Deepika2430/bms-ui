@@ -126,6 +126,9 @@ export const getProjects = async () => {
         });
 
         const projects = await response.json();
+        if (!response.ok) {
+            throw new Error(`${projects.error}`);
+        }
         return projects.map(project => ({
             ...transformKeysToCamelCase(project),
             client: project.clients?.company_name

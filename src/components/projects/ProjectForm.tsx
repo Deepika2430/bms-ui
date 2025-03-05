@@ -92,18 +92,32 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
       projectCode: initialData?.projectCode ?? "",
       projectName: initialData?.projectName ?? "",
       projectDescription: initialData?.projectDescription ?? "",
-      plannedStartDate: initialData?.plannedStartDate ? format(new Date(initialData?.plannedStartDate), "yyyy-MM-dd") : null,
-      plannedEndDate: initialData?.plannedEndDate ? format(new Date(initialData?.plannedEndDate), "yyyy-MM-dd") : null,
-      revisedPlannedEndDate: initialData?.revisedPlannedEndDate ? format(new Date(initialData?.revisedPlannedEndDate), "yyyy-MM-dd") : null,
-      actualStartDate: initialData?.actualStartDate ? format(new Date(initialData?.actualStartDate), "yyyy-MM-dd") : null,
-      actualEndDate: initialData?.actualEndDate ? format(new Date(initialData?.actualEndDate), "yyyy-MM-dd") : null,
+      plannedStartDate: initialData?.plannedStartDate
+        ? new Date(initialData.plannedStartDate).toISOString().split('T')[0]
+        : "",
+      plannedEndDate: initialData?.plannedEndDate
+        ? new Date(initialData.plannedEndDate).toISOString().split('T')[0]
+        : "",
+      revisedPlannedEndDate: initialData?.revisedPlannedEndDate
+        ? new Date(initialData.revisedPlannedEndDate).toISOString().split('T')[0]
+        : "",
+      actualStartDate: initialData?.actualStartDate
+        ? new Date(initialData.actualStartDate).toISOString().split('T')[0]
+        : "",
+      actualEndDate: initialData?.actualEndDate
+        ? new Date(initialData.actualEndDate).toISOString().split('T')[0]
+        : "",
       contractedEfforts: initialData?.contractedEfforts ?? "",
       plannedEfforts: initialData?.plannedEfforts ?? "",
       poNumber: initialData?.poNumber ?? "",
       poAmount: initialData?.poAmount ?? "",
       currency: initialData?.currency ?? "",
-      poStartDate: initialData?.poStartDate ? format(new Date(initialData?.poStartDate), "yyyy-MM-dd") : null,
-      poEndDate: initialData?.poEndDate ? format(new Date(initialData?.poEndDate), "yyyy-MM-dd") : null,
+      poStartDate: initialData?.poStartDate
+        ? new Date(initialData.poStartDate).toISOString().split('T')[0]
+        : "",
+      poEndDate: initialData?.poEndDate
+        ? new Date(initialData.poEndDate).toISOString().split('T')[0]
+        : "",
       poValidity: initialData?.poValidity ?? "",
       poUpliftmentDetails: initialData?.poUpliftmentDetails ?? "",
       comments: initialData?.comments ?? "",
