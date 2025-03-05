@@ -83,7 +83,7 @@ export function TimesheetEventComponent({ event, assignedTasks, readOnly, onAppr
             className={cn(
               "px-2 py-1 rounded-sm border text-sm max-w-full overflow-hidden whitespace-nowrap text-ellipsis transition-all",
               getTaskColor(event.task, assignedTasks),
-              !readOnly && "cursor-pointer"
+              !readOnly && "cursor-pointer hover:shadow-sm"
             )}
           >
             <div className="font-medium flex items-center justify-between gap-1">
@@ -110,7 +110,12 @@ export function TimesheetEventComponent({ event, assignedTasks, readOnly, onAppr
             </div>
           </div>
         </TooltipTrigger>
-        <TooltipContent className="p-4 max-w-xs bg-white border border-indigo-100 shadow-lg">
+        <TooltipContent
+          className="p-4 max-w-xs bg-white border border-indigo-100 shadow-lg z-[100] "
+          sideOffset={5}
+          // side="right"
+          // align="start"
+        >
           <div>
             <div className="font-bold mb-1 flex items-center justify-between">
               {event.taskName}

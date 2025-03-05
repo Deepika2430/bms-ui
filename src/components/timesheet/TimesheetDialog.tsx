@@ -132,9 +132,9 @@ export function TimesheetDialog({
                   <SelectValue placeholder="Select a task" />
                 </SelectTrigger>
                 <SelectContent>
-                  {assignedTasks.map((task) => (
+                  {assignedTasks && assignedTasks.map((task) => (
                     <SelectItem key={task.id} value={task.id}>
-                      {task.taskTitle}
+                      {task.taskTitle || task.title}
                     </SelectItem>
                   ))}
                 </SelectContent>

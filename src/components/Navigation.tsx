@@ -421,7 +421,7 @@ const Navigation = () => {
           }`}
         >
           <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-            {links.map((link) => {
+            {filteredNavItems.map((link) => {
               const isActive = location.pathname === link.path;
               const Icon = link.icon;
               return (

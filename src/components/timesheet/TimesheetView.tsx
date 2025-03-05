@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, CalendarIcon, CirclePlus, CheckCircle, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "react-toastify";
-import { getWorkLogs, addWorkLog, WorkLog } from '@/services/workLogsService';
+import { getWorkLogs, addWorkLog, WorkLog, updateWorkLog } from '@/services/workLogsService';
 import { TimesheetDialog } from './TimesheetDialog';
 import { TimesheetEventComponent } from './TimesheetEventComponent';
 import { DayCellComponent } from './DayCellComponent';
 import { CustomToolbar } from './CustomToolbar';
 import { WorkLogDetailsDialog } from './WorkLogDetailsDialog';
+import { getAssignedTasks } from "@/services/taskService";
 
 const locales = { "en-US": enUS };
 
@@ -71,6 +72,7 @@ export default function TimesheetView({
   const [editingId, setEditingId] = useState<string | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [selectedWorkLog, setSelectedWorkLog] = useState(null);
+  const [userTasks, setUserTasks] = useState<any[]>([]);
 
   useEffect(() => {
     if (initialWorkLogs && initialWorkLogs.length > 0) {
@@ -100,8 +102,18 @@ export default function TimesheetView({
       setWorkLogs(calendarEvents);
     } else {
       fetchWorkLogs();
+      if (assignedTasks.length === 0) {
+        fetchAssignedTasks();
+      } else {
+        setUserTasks(assignedTasks);
+      }
     }
-  }, [userId]);
+  }, [userId, assignedTasks]);
+
+  const fetchAssignedTasks = async () => {
+    const response = await getAssignedTasks();
+    setUserTasks(response);
+  }
 
   const fetchWorkLogs = async () => {
     try {
@@ -167,7 +179,7 @@ export default function TimesheetView({
     try {
       if (editingId) {
         // Handle update
-        await addWorkLog({ ...formData, id: editingId });
+        await updateWorkLog(editingId, formData);
         toast.success('Timesheet entry updated successfully');
       } else {
         // Handle create
@@ -187,7 +199,7 @@ export default function TimesheetView({
     event: (props: any) => (
       <TimesheetEventComponent
         {...props}
-        assignedTasks={assignedTasks}
+        assignedTasks={assignedTasks.length > 0 ? assignedTasks : userTasks}
         readOnly={readOnly}
       />
     ),
@@ -246,7 +258,7 @@ export default function TimesheetView({
           onOpenChange={(open) => !open && setSelectedDate(null)}
           date={selectedDate}
           editingId={editingId}
-          assignedTasks={assignedTasks}
+          assignedTasks={assignedTasks.length > 0 ? assignedTasks : userTasks}
           onSave={handleSaveEntry}
           workLogs={workLogs}
         />

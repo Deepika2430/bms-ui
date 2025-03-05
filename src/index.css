@@ -111,3 +111,29 @@
   --tooltip-text: #ffffff;
   --tooltip-border: #64748b; /* Tailwind gray-500 */
 }
+
+.radix-tooltip-content {
+  z-index: 9999 !important;
+}
+
+/* Ensure calendar date headers stay below tooltips */
+.rbc-header {
+  z-index: 1;
+}
+
+.rbc-month-view {
+  z-index: 1;
+}
+
+.rbc-row-content {
+  z-index: 2;
+}
+
+/* Optional: Add if tooltips still get cut off */
+.rbc-calendar {
+  overflow: visible !important;
+}
+
+.rbc-event {
+  z-index: 3;
+}
