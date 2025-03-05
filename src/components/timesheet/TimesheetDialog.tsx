@@ -108,7 +108,7 @@ export function TimesheetDialog({
         </DialogHeader>
 
         {isReadOnly && (
-          <Alert className="mb-4">
+          <Alert className="mb-0 ">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               This timesheet entry has been approved and cannot be modified.

@@ -2,6 +2,7 @@ import config from "@/config";
 import { Cookie } from "js-cookie";
 import { transformKeysToCamelCase } from "@/utils/transformKeys";
 import { getToken } from "./authService";
+import { getUserIdFromToken } from "@/utils/decodeToken";
 
 export const getDepartments = async () => {
     try {
@@ -25,6 +26,7 @@ export const getDepartments = async () => {
 
 export const getDepartmentUsers = async () => {
     const token = getToken();
+    const userId = getUserIdFromToken(token);
     try {
         const response = await fetch(`${config.apiBaseUrl}/departments/users`, {
             method: "GET",
@@ -37,8 +39,12 @@ export const getDepartmentUsers = async () => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-
-        return transformKeysToCamelCase(await response.json());
+        let data = await response.json();
+        const updatedData = data?.employee_details?.filter((employee: any) => {
+            if (employee?.user_id !== userId) return employee;
+        });
+        data.employee_details = updatedData;
+        return transformKeysToCamelCase(data);
     } catch (error) {
         console.error("Error fetching department users:", error);
         throw error;

@@ -59,7 +59,7 @@ export function TimesheetEventComponent({ event, assignedTasks, readOnly, onAppr
           "px-2 py-1 rounded-sm border text-sm cursor-pointer transition-all",
           "hover:shadow-sm",
           event.status === 'approved' && "bg-green-50 border-green-200",
-          event.status === 'rejected' && "bg-red-50 border-red-200",
+          event.status === 'rejected' && "bg-red-50 border-red-300",
           event.status === 'pending' && "bg-yellow-50 border-yellow-200"
         )}
       >
@@ -67,7 +67,7 @@ export function TimesheetEventComponent({ event, assignedTasks, readOnly, onAppr
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
             <span className="text-black">{event.hours} hrs</span>
-            {getStatusIcon(event.status)}{event.status}
+            {getStatusIcon(event.status)}<span className="text-black">{event.status.charAt(0).toUpperCase() + event.status.slice(1)}</span>
           </div>
         </div>
       </div>

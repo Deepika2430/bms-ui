@@ -46,6 +46,13 @@ export default function ManageTeamTimesheet() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [singleLogRejection, setSingleLogRejection] = useState<{
+    logId: string | null;
+    reason: string;
+  }>({
+    logId: null,
+    reason: ""
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,6 +62,7 @@ export default function ManageTeamTimesheet() {
           getDepartmentUsers(),
           getAssignedTasks()
         ]);
+        console.log(departmentData);
         if (departmentData && departmentData?.employeeDetails) {
           setDepartmentUsers(departmentData?.employeeDetails);
         }
@@ -70,7 +78,10 @@ export default function ManageTeamTimesheet() {
   }, []);
 
   const fetchUserWorkLogs = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser) {
+      setUserWorkLogs([]);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -79,14 +90,21 @@ export default function ManageTeamTimesheet() {
     } catch (error) {
       console.error('Error fetching user work logs:', error);
       toast.error('Failed to load timesheet entries');
+      setUserWorkLogs([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+
     fetchUserWorkLogs();
   }, [selectedUser]);
+
+  const handleUserChange = (userId: string) => {
+    setSelectedUser(userId);
+    setUserWorkLogs([]);
+  };
 
   const getDateRangeText = () => {
     switch (approvalType) {
@@ -235,30 +253,12 @@ export default function ManageTeamTimesheet() {
     }
   };
 
-  const handleSingleLogAction = async (logId: string, action: 'approve' | 'reject', approvalType?: string, date?: Date) => {
+  const handleSingleLogAction = async (logId: string, action: 'approve' | 'reject') => {
     if (action === 'approve') {
       try {
         setIsProcessing(true);
-        if (approvalType && date) {
-          let logsToApprove = [];
-          const startDate = approvalType === 'week'
-            ? startOfWeek(date, { weekStartsOn: 1 })
-            : startOfMonth(date);
-          const endDate = approvalType === 'week'
-            ? endOfWeek(date, { weekStartsOn: 1 })
-            : endOfMonth(date);
-
-          logsToApprove = userWorkLogs.filter(log => {
-            const logDate = new Date(log.work_date);
-            return logDate >= startDate && logDate <= endDate && log.status.toLowerCase() === 'pending';
-          });
-
-          await Promise.all(logsToApprove.map(log => approveWorkLog(log.id)));
-          toast.success(`All ${approvalType} entries approved successfully`);
-        } else {
-          await approveWorkLog(logId);
-          toast.success('Entry approved successfully');
-        }
+        await approveWorkLog(logId);
+        toast.success('Entry approved successfully');
         fetchUserWorkLogs();
       } catch (error) {
         console.error('Error approving entry:', error);
@@ -267,8 +267,31 @@ export default function ManageTeamTimesheet() {
         setIsProcessing(false);
       }
     } else {
-      setSelectedLogForRejection(logId);
-      setShowRejectDialog(true);
+      // Show rejection dialog for single log
+      setSingleLogRejection({
+        logId,
+        reason: ""
+      });
+    }
+  };
+
+  const handleSingleLogReject = async () => {
+    if (!singleLogRejection.logId || !singleLogRejection.reason.trim()) {
+      toast.error('Please provide a reason for rejection');
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      await rejectWorkLog(singleLogRejection.logId, singleLogRejection.reason);
+      toast.success('Entry rejected successfully');
+      setSingleLogRejection({ logId: null, reason: "" });
+      fetchUserWorkLogs();
+    } catch (error) {
+      console.error('Error rejecting entry:', error);
+      toast.error('Failed to reject entry');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -286,15 +309,15 @@ export default function ManageTeamTimesheet() {
     <Card className="overflow-hidden mb-0 pb-0">
       <CardContent className="overflow-hidden pb-0">
         <div className="flex items-center gap-4 mb-0 pt-16 pb-2">
-          <Label>Select Consultant: </Label>
+          <Label className="whitespace-nowrap">Select Consultant: </Label>
           <div className="flex-1">
             <Select
               value={selectedUser}
-              onValueChange={setSelectedUser}
+              onValueChange={handleUserChange}
             >
               <SelectTrigger>
                 <SelectValue
-                  placeholder="Select Team Member"
+                  placeholder="Select a consultant to view their timesheet"
                   className="text-muted-foreground"
                 />
               </SelectTrigger>
@@ -336,17 +359,23 @@ export default function ManageTeamTimesheet() {
           )}
         </div>
 
-        {selectedUser && (
-          <TimesheetView
-            userId={selectedUser}
-            readOnly={true}
-            onApprove={(logId) => handleSingleLogAction(logId, 'approve')}
-            onReject={(logId) => handleSingleLogAction(logId, 'reject')}
-            assignedTasks={assignedTasks}
-            initialWorkLogs={userWorkLogs}
-            style={{ height: '500px' }}
-            isProcessing={isProcessing}
-          />
+        {loading ? (
+          <div className="flex items-center justify-center p-8">
+            <div className="text-muted-foreground">Loading timesheet data...</div>
+          </div>
+        ) : (
+          selectedUser && (
+            <TimesheetView
+              userId={selectedUser}
+              readOnly={true}
+              onApprove={(logId) => handleSingleLogAction(logId, 'approve')}
+              onReject={(logId) => handleSingleLogAction(logId, 'reject')}
+              assignedTasks={assignedTasks}
+              initialWorkLogs={userWorkLogs}
+              style={{ height: '500px' }}
+              isProcessing={isProcessing}
+            />
+          )
         )}
 
         <Dialog open={showRejectDialog} onOpenChange={(open) => {
@@ -566,6 +595,57 @@ export default function ManageTeamTimesheet() {
               >
                 <CheckCircle className="h-4 w-4 mr-1" />
                 Approve Selected
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={!!singleLogRejection.logId}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSingleLogRejection({ logId: null, reason: "" });
+            }
+          }}
+        >
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Reject Timesheet Entry</DialogTitle>
+              <DialogDescription>
+                Please provide a reason for rejection
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="rejection-reason">Rejection Reason</Label>
+                <Textarea
+                  id="rejection-reason"
+                  value={singleLogRejection.reason}
+                  onChange={(e) => setSingleLogRejection(prev => ({
+                    ...prev,
+                    reason: e.target.value
+                  }))}
+                  placeholder="Enter reason for rejection..."
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setSingleLogRejection({ logId: null, reason: "" })}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleSingleLogReject}
+                disabled={isProcessing || !singleLogRejection.reason.trim()}
+              >
+                <XCircle className="h-4 w-4 mr-1" />
+                Reject Entry
               </Button>
             </DialogFooter>
           </DialogContent>
