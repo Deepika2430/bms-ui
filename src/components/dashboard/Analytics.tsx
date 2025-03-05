@@ -220,10 +220,10 @@ const Analytics = () => {
           </div>
 
           <div className="bg-white dark:bg-card rounded-lg shadow-sm border border-border p-4 flex flex-col items-center">
-            <h2 className="text-lg font-medium mb-2">Average Utilization</h2>
-            <div className="text-4xl font-bold text-primary mt-4 mb-2">87%</div>
+            <h2 className="text-lg font-medium mb-2">Projects Completed</h2>
+            <div className="text-4xl font-bold text-primary mt-4 mb-2">2</div>
             <p className="text-sm text-muted-foreground">
-              Team utilization{" "}
+              Projects completed {" "}
               {timeRange === "week"
                 ? "this week"
                 : timeRange === "month"
