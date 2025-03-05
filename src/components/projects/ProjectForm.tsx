@@ -93,31 +93,31 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
       projectName: initialData?.projectName ?? "",
       projectDescription: initialData?.projectDescription ?? "",
       plannedStartDate: initialData?.plannedStartDate
-        ? new Date(initialData.plannedStartDate).getTime()
-        : null,
+        ? new Date(initialData.plannedStartDate).toISOString().split('T')[0]
+        : "",
       plannedEndDate: initialData?.plannedEndDate
-        ? new Date(initialData.plannedEndDate).getTime()
-        : null,
+        ? new Date(initialData.plannedEndDate).toISOString().split('T')[0]
+        : "",
       revisedPlannedEndDate: initialData?.revisedPlannedEndDate
-        ? new Date(initialData.revisedPlannedEndDate).getTime()
-        : null,
+        ? new Date(initialData.revisedPlannedEndDate).toISOString().split('T')[0]
+        : "",
       actualStartDate: initialData?.actualStartDate
-        ? new Date(initialData.actualStartDate).getTime()
-        : null,
+        ? new Date(initialData.actualStartDate).toISOString().split('T')[0]
+        : "",
       actualEndDate: initialData?.actualEndDate
-        ? new Date(initialData.actualEndDate).getTime()
-        : null,
+        ? new Date(initialData.actualEndDate).toISOString().split('T')[0]
+        : "",
       contractedEfforts: initialData?.contractedEfforts ?? "",
       plannedEfforts: initialData?.plannedEfforts ?? "",
       poNumber: initialData?.poNumber ?? "",
       poAmount: initialData?.poAmount ?? "",
       currency: initialData?.currency ?? "",
       poStartDate: initialData?.poStartDate
-        ? new Date(initialData.poStartDate).getTime()
-        : null,
+        ? new Date(initialData.poStartDate).toISOString().split('T')[0]
+        : "",
       poEndDate: initialData?.poEndDate
-        ? new Date(initialData.poEndDate).getTime()
-        : null,
+        ? new Date(initialData.poEndDate).toISOString().split('T')[0]
+        : "",
       poValidity: initialData?.poValidity ?? "",
       poUpliftmentDetails: initialData?.poUpliftmentDetails ?? "",
       comments: initialData?.comments ?? "",
