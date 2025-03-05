@@ -15,6 +15,8 @@ import AuthForm from "../components/AuthForm";
 import NotFound from "../pages/NotFound";
 import { getToken, getRole } from "../services/authService";
 import NotificationsHistory from "./NotificationHistory";
+import MyTimesheet from "./timesheet/MyTimesheet";
+import ManageTeamTimesheet from "./timesheet/ManageTeamTimesheet";
 
 const AuthHandler = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!getToken());
@@ -73,13 +75,14 @@ const AuthHandler = () => {
             <Route path="projects" element={<Projects />} />
               <Route path="tasks" element={<Tasks />} />
               <Route path="settings" element={<Settings />} />
-              <Route path="/timesheet" element={<Timesheet />} />
+              <Route path="/my-timesheet" element={<MyTimesheet />} />
+              <Route path="/manage-team-timesheet" element={<ManageTeamTimesheet />} />
             </>
           )}
           {role === "consultant" && (
             <>
               <Route path="tasks" element={<ConsultantTasks />} />
-              <Route path="/timesheet" element={<Timesheet />} />
+              <Route path="/timesheet" element={<MyTimesheet />} />
               <Route path="settings" element={<Settings />} />
             </>
           )}

@@ -34,6 +34,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import NotificationItem from "./NotificationItem";
 import { getNotifications, updateNotification } from "@/services/notificationService";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu"
 
 interface NavLink {
   path: string;
@@ -41,6 +49,7 @@ interface NavLink {
   icon: React.ElementType;
   action?: () => void; // Optional action for signout
   allowedRoles?: string[];
+  subMenu?: { path: string; label: string }[];
 }
 
 const Navigation = () => {
@@ -60,11 +69,11 @@ const Navigation = () => {
   };
   useEffect(() => {
     fetchNotifications(); // Initial fetch
-  
+
     const interval = setInterval(() => {
       fetchNotifications();
     }, 60000); // Fetch every 60 seconds
-  
+
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
 
@@ -148,7 +157,23 @@ const Navigation = () => {
       path: "/timesheet",
       label: "Timesheet",
       icon: Settings,
-      allowedRoles: ["manager", "consultant", "associate-consultant"],
+      allowedRoles: ["consultant", "associate-consultant"],
+    },
+    {
+      path: "/my-timesheet",
+      label: "Timesheet",
+      icon: Settings,
+      allowedRoles: ["manager"],
+      subMenu: [
+        {
+          path: "/my-timesheet",
+          label: "My Timesheet",
+        },
+        {
+          path: "/manage-team-timesheet",
+          label: "Manage Team Timesheet",
+        },
+      ],
     },
   ];
 
@@ -186,8 +211,42 @@ const Navigation = () => {
 
             {/* Desktop navigation */}
             <div className="hidden md:flex items-center space-x-1">
-              {filteredNavItems.map(({ path, label, icon: Icon, action }) => {
+              {filteredNavItems.map(({ path, label, icon: Icon, action, subMenu }) => {
                 const isActive = location.pathname === path;
+
+                if (subMenu) {
+                  return (
+                    <NavigationMenu key={path}>
+                      <NavigationMenuList>
+                        <NavigationMenuItem>
+                          <NavigationMenuTrigger
+                            className={`px-4 py-2 text-sm font-medium flex items-center space-x-2
+                              ${isActive ? "bg-nav-accent/10 text-nav-accent" : "text-gray-600"}`}
+                          >
+                            <Icon className="h-4 w-4" />
+                            <span>{label}</span>
+                          </NavigationMenuTrigger>
+                          <NavigationMenuContent>
+                            <ul className="grid w-[200px] gap-1 p-2">
+                              {subMenu.map((item) => (
+                                <li key={item.path}>
+                                  <Button
+                                    variant="ghost"
+                                    className="w-full justify-start"
+                                    onClick={() => navigate(item.path)}
+                                  >
+                                    {item.label}
+                                  </Button>
+                                </li>
+                              ))}
+                            </ul>
+                          </NavigationMenuContent>
+                        </NavigationMenuItem>
+                      </NavigationMenuList>
+                    </NavigationMenu>
+                  );
+                }
+
                 return (
                   <button
                     key={path}

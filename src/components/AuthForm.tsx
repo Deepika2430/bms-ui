@@ -1,23 +1,25 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { register, login, setAuthToken } from "@/services/authService";
-import { toast } from "react-toastify";
-import { getToken } from "@/services/authService";
+import React, { useEffect, useState } from 'react';
+import { LockKeyhole, Mail, ArrowRight, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { getToken, login, setAuthToken } from '@/services/authService';
 
-export default function AuthForm({ onClose }) {
-  const [isRegister, setIsRegister] = useState(false);
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-    name: "",
-    empId: "",
-  });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+function AuthForm() {
   const navigate = useNavigate();
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  useEffect(() => {
+    if (getToken()) {
+      navigate("/home", { replace: true });
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,23 +28,16 @@ export default function AuthForm({ onClose }) {
       toast.error("Email and Password are required!");
       return;
     }
-    if (isRegister && (!form.name || !form.empId)) {
-      setError("Name and Employee ID are required for registration!");
-      toast.error("Name and Employee ID are required for registration!");
-      return;
-    }
+
     setError("");
     setLoading(true);
 
     try {
-      if (isRegister) {
-        await register(form.name, form.email, form.password);
-        toast.success("Registration Successful!");
-      } else {
+
         const response = await login(form.email, form.password);
         setAuthToken(response.token);
         toast.success("Login Successful!");
-      }
+
       window.dispatchEvent(new Event("authChange"));
       navigate("/home");
     } catch (err) {
@@ -53,98 +48,183 @@ export default function AuthForm({ onClose }) {
     }
   };
 
-  useEffect(() => {
-    if (getToken()) {
-      navigate("/home", { replace: true });
-    }
-  }, []);
+  const handleForgotPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    // Simulated password reset email
+    setTimeout(() => {
+      setLoading(false);
+      setResetEmailSent(true);
+    }, 1500);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    });
+  };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96 relative">
-        {/* Close Button */}
-        <button
-          onClick={() => navigate("/")}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-        >
-          &times;
-        </button>
-        <h2 className="text-xl font-bold mb-2">
-          {isRegister ? "Register" : "Login"}
-        </h2>
-
-        {/* Form with Loading Overlay */}
-        <div className="relative">
-          {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 rounded-lg">
-              <div className="loader"></div> {/* Ensures spinner is visible */}
-              <p className="text-gray-500">Please wait...</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {isRegister && (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            {isForgotPassword ? (
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setIsForgotPassword(false);
+                    setResetEmailSent(false);
+                  }}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600 transition-colors duration-200"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Reset Password
+                </h1>
+                <p className="text-gray-600">
+                  {resetEmailSent
+                    ? "Check your email for reset instructions"
+                    : "Enter your email to receive reset instructions"}
+                </p>
+              </div>
+            ) : (
               <>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Name"
-                  value={form.name}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                  disabled={loading}
-                />
-                <input
-                  type="text"
-                  name="empId"
-                  placeholder="Employee ID"
-                  value={form.empId}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded"
-                  required
-                  disabled={loading}
-                />
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Welcome Back
+                </h1>
+                <p className="text-gray-600">
+                  Sign in to continue to your account
+                </p>
               </>
             )}
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-              disabled={loading}
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-              required
-              disabled={loading}
-            />
-            {error && <p className="text-red-500">{error}</p>}
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white p-2 rounded"
-              disabled={loading}
-            >
-              {isRegister ? "Register" : "Login"}
-            </button>
-          </form>
+          </div>
+
+          {/* Form */}
+          {isForgotPassword ? (
+            resetEmailSent ? (
+              <div className="text-center space-y-4">
+                <div className="text-green-600 bg-green-50 p-4 rounded-lg">
+                  Password reset email sent! Please check your inbox.
+                </div>
+                <button
+                  onClick={() => {
+                    setIsForgotPassword(false);
+                    setResetEmailSent(false);
+                  }}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Return to login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="Email Address"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span>Send Reset Instructions</span>
+                      <ArrowRight size={20} />
+                    </>
+                  )}
+                </button>
+              </form>
+            )
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="Email Address"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  required
+                />
+              </div>
+
+              <div className="relative">
+                <LockKeyhole className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  required
+                />
+              </div>
+
+              <div className="flex items-center justify-between text-sm">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-gray-600">Remember me</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setIsForgotPassword(true)}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Forgot password?
+                </button>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <ArrowRight size={20} />
+                  </>
+                )}
+              </button>
+            </form>
+          )}
         </div>
 
-        <p
-          className="mt-3 text-sm cursor-pointer text-blue-600"
-          onClick={() => setIsRegister(!isRegister)}
-        >
-          {isRegister ? "Already have an account? Login" : "New user? Register"}
-        </p>
+        {/* Additional Info */}
+        <div className="mt-6 text-center text-gray-500 text-sm">
+          By continuing, you agree to our
+          <a href="#" className="text-blue-600 hover:text-blue-700 mx-1">Terms of Service</a>
+          and
+          <a href="#" className="text-blue-600 hover:text-blue-700 mx-1">Privacy Policy</a>
+        </div>
       </div>
     </div>
   );
 }
+
+export default AuthForm;

@@ -114,12 +114,15 @@ export const updateWorkLogStatus = async (id: string, { status, rejectionReason 
 export const approveWorkLog = async (id: string) => {
     const token = getToken();
     try {
-        const response = await fetch(`${config.apiBaseUrl}/work-logs/${id}/approve`, {
+        const response = await fetch(`${config.apiBaseUrl}/work-logs/${id}`, {
             method: "PUT",
             headers: {
                 "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
-            }
+            },
+            body: JSON.stringify({
+                status: "approved"
+            })
         });
 
         if (!response.ok) {
@@ -136,13 +139,16 @@ export const approveWorkLog = async (id: string) => {
 export const rejectWorkLog = async (id: string, rejectionReason: string) => {
     const token = getToken();
     try {
-        const response = await fetch(`${config.apiBaseUrl}/work-logs/${id}/reject`, {
+        const response = await fetch(`${config.apiBaseUrl}/work-logs/${id}`, {
             method: "PUT",
             headers: {
                 "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ rejection_reason: rejectionReason })
+            body: JSON.stringify({
+                status: "rejected",
+                comments: rejectionReason
+            })
         });
 
         if (!response.ok) {
@@ -156,10 +162,10 @@ export const rejectWorkLog = async (id: string, rejectionReason: string) => {
     }
 };
 
-export const getConsultantWorkLogs = async (userId: string) => {
+export const getConsultantWorkLogs = async (consultantId: string) => {
     const token = getToken();
     try {
-        const response = await fetch(`${config.apiBaseUrl}/work-logs/?user_id=${userId}`, {
+        const response = await fetch(`${config.apiBaseUrl}/work-logs/?user_id=${consultantId}`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,

@@ -26,17 +26,21 @@ export const getDepartments = async () => {
 export const getDepartmentUsers = async () => {
     const token = getToken();
     try {
-        const response = await fetch(`${config.apiBaseUrl}/departments/users/`, {
+        const response = await fetch(`${config.apiBaseUrl}/departments/users`, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${token}`
-            },
-            redirect: "follow"
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
         });
-        const teamMembers = (await response.json());
-        return teamMembers;
-    }
-    catch (error) {
-        return error?.message;
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return transformKeysToCamelCase(await response.json());
+    } catch (error) {
+        console.error("Error fetching department users:", error);
+        throw error;
     }
 }
