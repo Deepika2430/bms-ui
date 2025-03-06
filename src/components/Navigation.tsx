@@ -169,6 +169,12 @@ const Navigation = () => {
       allowedRoles: ["consultant", "associate-consultant"],
     },
     {
+      path: "/organization-chart",
+      label: "Organization Chart",
+      icon: Users,
+      allowedRoles: ["admin", "manager", "consultant", "associate"],
+    },
+    {
       path: "/my-timesheet",
       label: "Timesheet",
       icon: Settings,

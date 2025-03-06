@@ -5,8 +5,6 @@ import Index from "../pages/Index";
 import Projects from "../pages/Projects";
 import Clients from "../pages/Clients";
 import Tasks from "../pages/Tasks";
-import ManagerTasks from "../components/managers/TaskList";
-import Timesheet from "../pages/TimeSheet";
 import ConsultantTasks from "./consultant/Tasks";
 import Settings from "../pages/Settings";
 import BmsHome from "../pages/BmsHome";
@@ -17,6 +15,8 @@ import { getToken, getRole } from "../services/authService";
 import NotificationsHistory from "./NotificationHistory";
 import MyTimesheet from "./timesheet/MyTimesheet";
 import ManageTeamTimesheet from "./timesheet/ManageTeamTimesheet";
+import OrganizationChart from "../pages/OrganizationChart";
+import RegistrationForm from "@/pages/Registration";
 
 const AuthHandler = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!getToken());
@@ -63,11 +63,13 @@ const AuthHandler = () => {
           <Route path="home" element={<Index />} />
           <Route path="profile" element={<Profile/>} />
           <Route path="notifications" element={<NotificationsHistory/>} />
+          <Route path="organization-chart" element={<OrganizationChart/>} />
           {role === "admin" && (
             <>
               <Route path="projects" element={<Projects />} />
               <Route path="clients" element={<Clients />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="/register" element={<RegistrationForm/>} />
             </>
           )}
           {role === "manager" && (
