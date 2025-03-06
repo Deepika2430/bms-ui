@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const Index = () => {
+
+  const appTitle = "Tecnics Time-tracking System";
   const scrollToSection = (sectionId) => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
   };
@@ -45,7 +47,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-400 bg-clip-text text-transparent">
-            BMS
+            TTS
           </motion.h1>
           <div className="hidden md:flex space-x-6">
             <button onClick={() => scrollToSection("home")} className="hover:text-blue-500 transition">Home</button>
@@ -69,7 +71,7 @@ const Index = () => {
             Track Time, Boost Productivity
           </h1>
           <p className="text-lg text-gray-600 mb-8 max-w-xl mx-auto">
-            Streamline your time tracking with Blue Marlin System. Simple, intuitive, and designed for modern teams.
+            Streamline your time tracking with {appTitle}. Simple, intuitive, and designed for modern teams.
           </p>
           <div className="flex justify-center gap-4">
             <Link to="/login">
@@ -88,7 +90,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
             className="text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-6">
-            Why Choose Blue Marlin System?
+            Why Choose {appTitle}?
           </motion.h2>
           <div className="grid md:grid-cols-3 gap-8 mt-12">
             {features.map((feature, index) => (
