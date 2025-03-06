@@ -32,6 +32,7 @@ import {
   Edit,
 } from "lucide-react";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 const Users: React.FC = () => {
   const [search, setSearch] = useState("");
@@ -43,6 +44,7 @@ const Users: React.FC = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [formData, setFormData] = useState<Partial<User>>({});
   const [viewMode, setViewMode] = useState(true);
+  const navigate = useNavigate();
 
   const roles = ["admin", "manager", "consultant", "associate-consultant"];
 
@@ -51,7 +53,7 @@ const Users: React.FC = () => {
       setLoading(true);
       const response = await getAllUsers();
       setUsers(response || []);
-      console.log(response)
+      console.log(response);
       setError(null);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -160,6 +162,9 @@ const Users: React.FC = () => {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
+            <Button onClick={() => navigate("/register")}>
+              Register Employee
+            </Button>
           </div>
 
           {loading ? (
@@ -193,68 +198,78 @@ const Users: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {users.length > 0 ? users
-                    ?.filter(
-                      (user) =>
-                        user.name
-                          .toLowerCase()
-                          .includes(search.toLowerCase()) ||
-                        (user.email &&
-                          user.email
+                  {users.length > 0 ? (
+                    users
+                      ?.filter(
+                        (user) =>
+                          user.employee_details.first_name
                             .toLowerCase()
-                            .includes(search.toLowerCase()))
-                    )
-                    .map((user) => (
-                      <tr
-                        key={user.id}
-                        className="hover:bg-accent transition-colors duration-200 cursor-pointer"
-                        onClick={() => handleUserClick(user)}
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
-                              {user.employee_details?.first_name?.[0]}
-                              {user.employee_details?.last_name?.[0]}
-                            </div>
-                            <div className="ml-4">
-                              <div className="font-medium">
-                                {user.employee_details?.first_name}{" "}
-                                {user.employee_details?.last_name}
+                            .includes(search.toLowerCase()) ||
+                          (user.email &&
+                            user.email
+                              .toLowerCase()
+                              .includes(search.toLowerCase())) ||
+                          (user.employee_details.last_name &&
+                            user.employee_details.last_name
+                              .toLowerCase()
+                              .includes(search.toLowerCase())) ||
+                          (user.role &&
+                            user.role
+                              .toLowerCase()
+                              .includes(search.toLowerCase()))
+                      )
+                      .map((user) => (
+                        <tr
+                          key={user.id}
+                          className="hover:bg-accent transition-colors duration-200 cursor-pointer"
+                          onClick={() => handleUserClick(user)}
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                                {user.employee_details?.first_name?.[0]}
+                                {user.employee_details?.last_name?.[0]}
                               </div>
-                              <div className="text-sm text-muted-foreground">
-                                {user?.employee_details?.designation}
+                              <div className="ml-4">
+                                <div className="font-medium">
+                                  {user.employee_details?.first_name}{" "}
+                                  {user.employee_details?.last_name}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {user?.employee_details?.designation}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                            {user.role}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {user.email}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-muted-foreground hover:text-foreground"
-                            onClick={(e) => handleEditClick(e, user)}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                            <ChevronRight className="h-4 w-4 ml-1" />
-                          </Button>
-                        </td>
-                      </tr>
-                    )) : (
-                      <tr>
-                        <td colSpan={4} className="text-center py-4">
-                          No users found.
-                        </td>
-                      </tr>
-                    )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                              {user.role}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            {user.email}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-muted-foreground hover:text-foreground"
+                              onClick={(e) => handleEditClick(e, user)}
+                            >
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                              <ChevronRight className="h-4 w-4 ml-1" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="text-center py-4">
+                        No users found.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
