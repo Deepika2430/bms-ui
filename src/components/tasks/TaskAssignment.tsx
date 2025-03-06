@@ -89,7 +89,7 @@ const TaskAssignment = ({ tasks, consultants }: TaskAssignmentProps) => {
           <SelectContent>
             {consultants.map((consultant) => (
               <SelectItem key={consultant.id} value={consultant.id}>
-                {consultant.name}
+                {consultant?.employeeDetails?.firstName}
               </SelectItem>
             ))}
           </SelectContent>

@@ -58,9 +58,9 @@ const TaskCard = ({ task, assignee, onClick, className }: TaskCardProps) => {
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">
             <AvatarImage src={assignee?.avatar} alt={assignee?.name} />
-            <AvatarFallback>{assignee?.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{assignee?.employee_details?.first_name.charAt(0)+assignee?.employee_details?.last_name.charAt(0)}</AvatarFallback>
           </Avatar>
-          <span className="text-xs">{assignee?.name}</span>
+          <span className="text-xs">{assignee?.employee_details?.first_name + " " + assignee?.employee_details?.last_name}</span>
         </div>
         
         <span className="text-xs text-muted-foreground">
