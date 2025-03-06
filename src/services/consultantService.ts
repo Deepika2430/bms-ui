@@ -65,7 +65,7 @@ export const getConsultantById = async (id: string): Promise<Consultant> => {
 
 export const getConsultants = async () => {
     try {
-        const response = await fetch(`${config.apiBaseUrl}/consultant`, {
+        const response = await fetch(`${config.apiBaseUrl}/user?role=consultant`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
