@@ -312,7 +312,7 @@ export default function ManageTeamTimesheet() {
           <Label className="whitespace-nowrap">Select Consultant: </Label>
           <div className="flex-1">
             <Select
-              value={selectedUser}
+              value={selectedUser || "Select a Consultant"}
               onValueChange={handleUserChange}
             >
               <SelectTrigger>
@@ -322,6 +322,7 @@ export default function ManageTeamTimesheet() {
                 />
               </SelectTrigger>
               <SelectContent>
+                  <SelectItem value="Select a Consultant" className="cursor-pointer" disabled>Select a consultant</SelectItem>
                 {departmentUsers?.map((user) => (
                   <SelectItem
                     key={user.userId}
