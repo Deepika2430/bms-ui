@@ -7,31 +7,43 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
-import { Edit, Eye } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Edit, Eye, Search } from "lucide-react";
 import { getClients } from "@/services/clientService";
+import { Input } from "../ui/input";
 
 interface ClientTableProps {
   onEdit: (client: any) => void;
   onSelect?: (client: any) => void;
   onView: (client: any) => void;
+  clients: any[];
+  fetchClients: () => Promise<void>;
 }
 
-const ClientTable = ({ onEdit, onSelect = () => {}, onView }: ClientTableProps) => {
-
-  const [clients, setClients ] = useState(null);
+const ClientTable = ({ onEdit, onSelect = () => { }, onView, clients, fetchClients }: ClientTableProps) => {
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const fetchClients = async () => {
-      const response = await getClients();
-      console.log(response.map((client) => console.log(client)));
-      setClients(response);
-    };
     fetchClients();
-  }, []);
+  }, [fetchClients]);
+
+  const filteredClients = useMemo(() => {
+    return clients?.filter(client => client.companyName.toLowerCase().includes(searchTerm.toLowerCase()));
+  }, [clients, searchTerm]);
 
   return (
-    <div className="rounded-md border ">
+    <div className="space-y-4 pt-4 ">
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            placeholder="Search projects..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-8 h-10 w-full"
+          />
+        </div>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
@@ -44,7 +56,7 @@ const ClientTable = ({ onEdit, onSelect = () => {}, onView }: ClientTableProps) 
           </TableRow>
         </TableHeader>
         <TableBody>
-          {clients?.map((client) => (
+          {filteredClients?.map((client) => (
             <TableRow key={client.id} onClick={() => onView(client)} className="cursor-pointer">
               <TableCell className="font-medium">{client?.companyName}</TableCell>
               <TableCell>{client?.contactPerson}</TableCell>

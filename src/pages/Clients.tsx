@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "react-toastify";
@@ -6,17 +6,29 @@ import ClientForm from "@/components/clients/ClientForm";
 import ClientTable from "@/components/clients/ClientTable";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getClients } from "@/services/clientService";
 
 const Clients = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<any>(null);
   const [viewingClient, setViewingClient] = useState<any>(null);
+  const [clients, setClients] = useState(null);
 
-  const handleCreateClient = (data: any) => {
+  const fetchClients = useCallback(async () => {
+    const response = await getClients();
+    setClients(response);
+  }, []);
+
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
+
+  const handleCreateClient = useCallback((data: any) => {
     editingClient ? toast.success("Client updated successfully") : toast.success("Client created successfully");
     setIsDialogOpen(false);
     setEditingClient(null);
-  };
+    fetchClients();
+  }, [editingClient, fetchClients]);
 
   const handleEdit = (client: any) => {
     setEditingClient(client);
@@ -51,7 +63,7 @@ const Clients = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ClientTable onEdit={handleEdit} onView={handleView} />
+            <ClientTable clients={clients} onEdit={handleEdit} onView={handleView} fetchClients={fetchClients} />
           </CardContent>
         </Card>
 
