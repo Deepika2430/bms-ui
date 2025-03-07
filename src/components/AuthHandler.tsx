@@ -26,6 +26,7 @@ import ConsultantDashboard from "@/components/consultant/Dashboard";
 const AuthHandler = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!getToken());
   const [role, setRole] = useState<string | null>(getRole(getToken()));
+  const [loading, setLoading] = useState<boolean>(true); // Add loading state
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,6 +44,7 @@ const AuthHandler = () => {
         setRole(null);
         setIsAuthenticated(false);
       }
+      setLoading(false); // Set loading to false after authentication check
     };
 
     window.addEventListener("authChange", handleAuthChange);
@@ -52,8 +54,8 @@ const AuthHandler = () => {
     };
   }, []);
 
-  if (isAuthenticated === null) {
-    return <div>Loading...</div>;
+  if (loading) {
+    return <div>Loading...</div>; // Show loading state
   }
 
   return (
@@ -66,15 +68,17 @@ const AuthHandler = () => {
       {isAuthenticated ? (
         <Route path="/" element={<Layout />}>
           <Route path="home" element={<HomeLayout />}>
-            {role === "consultant" && (
+            {(role === "consultant" || role === "associate-consultant" || role === "manager") && (
               <Route path="dashboard" element={<ConsultantDashboard />} />
             )}
             {role === "admin" && (
             <>
               <Route path="dashboard" element={<Dashboard />} />
-              <Route path="analytics" element={<Analytics />} />
               <Route path="users" element={<Users />} />
             </>
+            )}
+            {(role === "admin" || role === "manager") && (
+            <Route path="analytics" element={<Analytics />} />
             )}
             <Route path="settings" element={<ThemeSettings />} />
           </Route>
