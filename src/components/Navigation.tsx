@@ -95,19 +95,19 @@ const Navigation = () => {
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
 
-  const unreadCount = notifications?.filter((n) => !n.read).length;
+  const unreadCount = notifications?.length > 0 ? notifications?.filter((n) => !n.read)?.length : 0;
 
   const handleMarkAsRead = async (id: string) => {
     setNotifications(
-      notifications.map((n) => (n.id === id ? { ...n, read: true } : n))
+      notifications?.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
     await updateNotification(id);
     fetchNotifications();
   };
 
   const handleMarkAllAsRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, read: true })));
-    notifications.forEach(async (n) => {
+    setNotifications(notifications?.map((n) => ({ ...n, read: true })));
+    notifications?.forEach(async (n) => {
       await updateNotification(n.id);
     });
     fetchNotifications();
@@ -322,7 +322,7 @@ const Navigation = () => {
                       )}
                     </div>
                     <div className="max-h-[300px] overflow-y-auto">
-                      {notifications.length > 0 ? (
+                      {notifications?.length > 0 ? (
                         <div className="divide-y divide-border">
                           {notifications?.map((notification) => (
                             <NotificationItem
