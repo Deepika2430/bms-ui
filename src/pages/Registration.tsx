@@ -20,9 +20,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { toast } from "react-toastify";
-import { getDesignations, getDepartments, getManagers, getOrganizations } from "@/services/registrationService"; // Import service functions
+import {
+  getDesignations,
+  getDepartments,
+  getManagers,
+  getOrganizations,
+  registerUser,
+} from "@/services/registrationService"; // Import service functions
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const registrationSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
@@ -51,7 +64,9 @@ const registrationSchema = z.object({
   date_of_joining: z.string().min(1, "Date of joining is required"),
   role: z.enum(["admin", "consultant", "manager", "associate-consultant"]),
   other_details: z.string().optional(),
-  description: z.string().optional(),
+  date_of_birth: z.string().min(1, "Date of birth is required"),
+  contract_end_date: z.string().optional(),
+  gender: z.enum(["male", "female"]),
 });
 
 // Function to generate a random password
@@ -59,7 +74,8 @@ const generatePassword = () => {
   // Set the length of the password to 12
   const length = 12;
   // Set the charset to include all lowercase letters, uppercase letters, numbers, and special characters
-  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+  const charset =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
   let password = "";
   for (let i = 0, n = charset.length; i < length; ++i) {
     password += charset.charAt(Math.floor(Math.random() * n));
@@ -95,11 +111,15 @@ const RegistrationForm = () => {
       probation_period: "",
       status: "active",
       date_of_joining: new Date().toISOString().split("T")[0],
-      role: "admin",
+      role: "",
       other_details: "",
-      description: "",
+      date_of_birth: "",
+      contract_end_date: "",
+      gender: "",
     },
   });
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const [designations, setDesignations] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -109,7 +129,12 @@ const RegistrationForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [designationsData, departmentsData, managersData, organizationsData] = await Promise.all([
+        const [
+          designationsData,
+          departmentsData,
+          managersData,
+          organizationsData,
+        ] = await Promise.all([
           getDesignations(),
           getDepartments(),
           getManagers(),
@@ -128,48 +153,46 @@ const RegistrationForm = () => {
     fetchData();
   }, []);
 
-  const handleSubmit = (data: z.infer<typeof registrationSchema>) => {
-    console.log(data);
-    toast.success("Registration successful!");
+  const handleSubmit = async (data: z.infer<typeof registrationSchema>) => {
+    const {manager, designation, department, organization, ...rest} = data;
+    const dataToSubmit = {
+      ...rest,
+      manager_id: manager,
+      designation_id: designation,
+      department_id: department,
+      organization_id: organization,
+    }
+    console.log(dataToSubmit);
+    try {
+      const response = await registerUser(dataToSubmit);
+      if (response?.message) {
+        toast.success(response?.message || "Registration successful!");
+        navigate("/home"); // Navigate to /home upon successful registration
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error(`Failed to register employee ${error}`);
+    }
   };
 
   return (
     <Card className="p-6 pt-20">
       <CardHeader className="flex-row justify-between items-center">
         <CardTitle>Employee Registration Form</CardTitle>
-        <Button variant="link" onClick={() => window.history.back()} className="bg-red-500 text-white">
+        <Button
+          variant="link"
+          onClick={() => navigate("/home?component=Users")} // Navigate to /home Users component when Back button is clicked
+          className="bg-red-500 text-white"
+        >
           Back
         </Button>
       </CardHeader>
       <CardContent className="px-20 py-10">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="grid grid-cols-3 gap-2">
-            <FormField
-              control={form.control}
-              name="first_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First Name*</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="last_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Last Name*</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="grid grid-cols-3 gap-2"
+          >
             <FormField
               control={form.control}
               name="emp_id"
@@ -198,6 +221,45 @@ const RegistrationForm = () => {
             />
             <FormField
               control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password*</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} readOnly />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="first_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First Name*</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="last_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last Name*</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="personal_email"
               render={({ field }) => (
                 <FormItem>
@@ -205,6 +267,43 @@ const RegistrationForm = () => {
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="date_of_birth"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date of Birth</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gender*</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Gender" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -241,7 +340,10 @@ const RegistrationForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Designation*</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Designation" />
@@ -265,7 +367,10 @@ const RegistrationForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Department*</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Department" />
@@ -289,7 +394,10 @@ const RegistrationForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Manager*</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Manager" />
@@ -313,7 +421,10 @@ const RegistrationForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Organization*</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Organization" />
@@ -321,7 +432,10 @@ const RegistrationForm = () => {
                     </FormControl>
                     <SelectContent>
                       {organizations.map((organization) => (
-                        <SelectItem key={organization.id} value={organization.id}>
+                        <SelectItem
+                          key={organization.id}
+                          value={organization.id}
+                        >
                           {organization.name}
                         </SelectItem>
                       ))}
@@ -435,19 +549,7 @@ const RegistrationForm = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password*</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <FormField
               control={form.control}
               name="notice_period"
@@ -469,6 +571,19 @@ const RegistrationForm = () => {
                   <FormLabel>Probation Period</FormLabel>
                   <FormControl>
                     <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="contract_end_date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Contract End Date</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -506,17 +621,21 @@ const RegistrationForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role*</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Role" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="consultant">Consultant</SelectItem>
                       <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="associate-consultant">Associate Consultant</SelectItem>
+                      <SelectItem value="associate-consultant">
+                        Associate Consultant
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -536,20 +655,14 @@ const RegistrationForm = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-        <Button type="submit" className="w-full bg-purple-700 text-white hover:bg-purple-900 align-middle">Submit</Button>
+            <div className=""></div>
+            <div className=""></div>
+            <Button
+              type="submit"
+              className="mt-16 w-full bg-purple-700 text-white hover:bg-purple-900 align-middle"
+            >
+              Submit
+            </Button>
           </form>
         </Form>
       </CardContent>

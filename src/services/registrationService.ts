@@ -88,14 +88,15 @@ export const getOrganizations = async () => {
 export const registerUser = async (data: any) => {
     try {
         const token = await getToken();
-        const response = await fetch(`${config.apiBaseUrl}/register`,
+        const response = await fetch(`${config.apiBaseUrl}/user/register`,
             {
                 method: "POST",
                 headers: {
 
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
-                }
+                },
+                body: JSON.stringify(data)
             });
         const responseData = await response.json();
         return responseData;

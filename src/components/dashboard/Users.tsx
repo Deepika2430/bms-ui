@@ -139,19 +139,22 @@ const Users: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in bg-white dark:bg-gray-900 dark:text-white overflow-y-auto">
-      <div className="mb-6">
-        <div className="inline-block px-2 py-1 rounded-full bg-accent text-accent-foreground text-2xl font-large mb-2">
-          User Management
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <div className="inline-block px-2 py-1 rounded-full bg-accent text-accent-foreground text-2xl font-large mb-2">
+            User Management
+          </div>
+          <p className="text-muted-foreground">
+            Manage and edit user information
+          </p>
         </div>
-        <p className="text-muted-foreground">
-          Manage and edit user information
-        </p>
+        <Button onClick={() => navigate("/register")}>Register Employee</Button>
       </div>
 
       <div className="bg-white dark:bg-card rounded-xl overflow-hidden border border-border/50 shadow-sm transition-all duration-300">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-medium">User Directory</h2>
+            {/* <h2 className="text-xl font-medium">User Directory</h2> */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -162,9 +165,6 @@ const Users: React.FC = () => {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <Button onClick={() => navigate("/register")}>
-              Register Employee
-            </Button>
           </div>
 
           {loading ? (
