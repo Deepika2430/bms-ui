@@ -26,7 +26,7 @@ import ConsultantDashboard from "@/components/consultant/Dashboard";
 const AuthHandler = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!getToken());
   const [role, setRole] = useState<string | null>(getRole(getToken()));
-  const [loading, setLoading] = useState<boolean>(true); // Add loading state
+  const [loading, setLoading] = useState<boolean>(false); // Add loading state
   const navigate = useNavigate();
 
   useEffect(() => {
