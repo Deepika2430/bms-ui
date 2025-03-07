@@ -40,7 +40,8 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
+} from "@/components/ui/navigation-menu";
+import config from "@/config";
 
 interface NavLink {
   path: string;
@@ -224,7 +225,7 @@ const Navigation = () => {
               <Link to="/" className="flex items-center">
                 <div className="flex-shrink-0 w-12 h-8 bg-nav-accent rounded-lg flex items-center justify-center">
                   <img
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYR9OQLjpoVN2lnE14Lx20UtUKZ-V2gbcGYw&s"
+                    src={`${config.apiBaseUrl}/assets/tts-logo.png`}
                     alt="BMS"
                     className="object-contain object-fill"
                   />
