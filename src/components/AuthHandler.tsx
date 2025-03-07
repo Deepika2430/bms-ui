@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Layout from "./Layout";
-import Index from "../pages/Index";
+import HomeLayout from "../pages/Index";
 import Projects from "../pages/Projects";
 import Clients from "../pages/Clients";
 import Tasks from "../pages/Tasks";
@@ -19,7 +19,8 @@ import OrganizationChart from "../pages/OrganizationChart";
 import RegistrationForm from "@/pages/Registration";
 import Analytics from "@/components/dashboard/Analytics";
 import Users from "@/components/dashboard/Users";
-import DashboardContent from "@/components/dashboard/Dashboard";
+import ThemeSettings from "@/components/dashboard/Settings";
+import Dashboard from "@/components/dashboard/Dashboard";
 
 const AuthHandler = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!getToken());
@@ -63,26 +64,26 @@ const AuthHandler = () => {
       {/* Protected Routes */}
       {isAuthenticated ? (
         <Route path="/" element={<Layout />}>
-          <Route path="home" element={<Index />}>
-            <Route path="dashboard" element={<DashboardContent />} />
+          <Route path="home" element={<HomeLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="users" element={<Users />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="settings" element={<ThemeSettings />} />
           </Route>
-          <Route path="profile" element={<Profile/>} />
-          <Route path="notifications" element={<NotificationsHistory/>} />
-          <Route path="organization-chart" element={<OrganizationChart/>} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="notifications" element={<NotificationsHistory />} />
+          <Route path="organization-chart" element={<OrganizationChart />} />
           {role === "admin" && (
             <>
               <Route path="projects" element={<Projects />} />
               <Route path="clients" element={<Clients />} />
               <Route path="settings" element={<Settings />} />
-              <Route path="/register" element={<RegistrationForm/>} />
+              <Route path="/register" element={<RegistrationForm />} />
             </>
           )}
           {role === "manager" && (
             <>
-            <Route path="projects" element={<Projects />} />
+              <Route path="projects" element={<Projects />} />
               <Route path="tasks" element={<Tasks />} />
               <Route path="settings" element={<Settings />} />
               <Route path="/my-timesheet" element={<MyTimesheet />} />
