@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import {
   BarChart,
   Bar,
@@ -19,39 +20,44 @@ import { getRole, getToken } from "@/services/authService";
 
 const Dashboard: React.FC = () => {
   const [search, setSearch] = useState("");
-  const [activeComponent, setActiveComponent] = useState<React.ReactNode>(null);
-  const [activeComponentName, setActiveComponentName] = useState<string>("");
   const [role, setRole] = useState<string>("consultant");
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const token = getToken();
     if (token) {
       const userRole = getRole(token) ?? "consultant";
       setRole(userRole);
-      setActiveComponent(userRole === "admin" ? <DashboardContent /> : userRole === "manager" ? <ConsultantDashboard /> : userRole === "consultant" ? <ConsultantDashboard /> : <DashboardContent />);
-      setActiveComponentName("Dashboard");
+      if (location.pathname === "/home") {
+        navigate("/home/dashboard");
+      }
     }
-  }, []);
+  }, [navigate, location.pathname]);
 
   const sidebarLinks = [
     {
       name: "Dashboard",
       icon: <LayoutDashboard size={20} />,
-      component: role === "admin" ? <DashboardContent /> : role === "manager" ? <ConsultantDashboard /> : role === "consultant" ? <ConsultantDashboard /> : <DashboardContent />,
+      path: "/home/dashboard",
       allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
     },
     {
       name: "Analytics",
       icon: <BarChart3Icon size={20} />,
-      component: <Analytics />,
-      allowedRoles: ["admin", "manager",],
+      path: "/home/analytics",
+      allowedRoles: ["admin", "manager"],
     },
-    { name: "Users", icon: <UsersIcon size={20} />, component: <Users />,
-    allowedRoles: ["admin", "manager"], },
+    {
+      name: "Users",
+      icon: <UsersIcon size={20} />,
+      path: "/home/users",
+      allowedRoles: ["admin", "manager"],
+    },
     {
       name: "Appearance",
       icon: <SettingsIcon size={20} />,
-      component: <Settings />,
+      path: "/home/settings",
       allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
     },
   ];
@@ -76,11 +82,10 @@ const Dashboard: React.FC = () => {
           {filteredSidebarItems.map((link) => (
             <button
               key={link.name}
-              onClick={() => {
-                setActiveComponent(link.component);
-                setActiveComponentName(link.name);
-              }}
-              className={`flex items-center w-full p-3 mb-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 ${activeComponentName === link.name ? "bg-gray-100 dark:bg-gray-700 text-nav-accent" : ""}`}
+              onClick={() => navigate(link.path)}
+              className={`flex items-center w-full p-3 mb-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 ${
+                location.pathname === link.path ? "bg-gray-200 dark:bg-gray-700" : ""
+              }`}
             >
               {link.icon}
               <span className="ml-3">{link.name}</span>
@@ -90,7 +95,14 @@ const Dashboard: React.FC = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-3 bg-white overflow-y-auto ml-64">{activeComponent}</main>
+      <main className="flex-1 p-3 bg-white overflow-y-auto ml-64">
+        <Routes>
+          <Route path="dashboard" element={<DashboardContent />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="users" element={<Users />} />
+          <Route path="settings" element={<Settings />} />
+        </Routes>
+      </main>
     </div>
   );
 };

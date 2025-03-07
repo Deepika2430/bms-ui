@@ -17,6 +17,9 @@ import MyTimesheet from "./timesheet/MyTimesheet";
 import ManageTeamTimesheet from "./timesheet/ManageTeamTimesheet";
 import OrganizationChart from "../pages/OrganizationChart";
 import RegistrationForm from "@/pages/Registration";
+import Analytics from "@/components/dashboard/Analytics";
+import Users from "@/components/dashboard/Users";
+import DashboardContent from "@/components/dashboard/Dashboard";
 
 const AuthHandler = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!getToken());
@@ -60,7 +63,12 @@ const AuthHandler = () => {
       {/* Protected Routes */}
       {isAuthenticated ? (
         <Route path="/" element={<Layout />}>
-          <Route path="home" element={<Index />} />
+          <Route path="home" element={<Index />}>
+            <Route path="dashboard" element={<DashboardContent />} />
+            <Route path="analytics" element={<Analytics />} />
+            <Route path="users" element={<Users />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
           <Route path="profile" element={<Profile/>} />
           <Route path="notifications" element={<NotificationsHistory/>} />
           <Route path="organization-chart" element={<OrganizationChart/>} />

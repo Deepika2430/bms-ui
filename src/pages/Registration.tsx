@@ -181,7 +181,7 @@ const RegistrationForm = () => {
         <CardTitle>Employee Registration Form</CardTitle>
         <Button
           variant="link"
-          onClick={() => navigate("/home?component=Users")} // Navigate to /home Users component when Back button is clicked
+          onClick={() => navigate("/home/users")} // Navigate to /home Users component when Back button is clicked
           className="bg-red-500 text-white"
         >
           Back
