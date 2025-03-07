@@ -9,30 +9,12 @@ import {
   Users,
   CheckSquare,
   Settings,
-  Bell,
 } from "lucide-react";
 import { clearAuthToken, getRole, getToken } from "@/services/authService";
 import { getUserDetails } from "@/services/userService";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import NotificationItem from "./NotificationItem";
-import {
-  getNotifications,
-  updateNotification,
-} from "@/services/notificationService";
+import NotificationMenu from "./notifications/NotificationMenu"; // Updated import path
+import ProfileMenu from "./ProfileMenu";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -59,7 +41,6 @@ const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
-  const [notifications, setNotifications] = useState([]);
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -79,39 +60,6 @@ const Navigation = () => {
       path,
     };
   });
-
-  const fetchNotifications = async () => {
-    const response = await getNotifications();
-    setNotifications(response);
-  };
-
-  useEffect(() => {
-    fetchNotifications(); // Initial fetch
-
-    const interval = setInterval(() => {
-      fetchNotifications();
-    }, 60000); // Fetch every 60 seconds
-
-    return () => clearInterval(interval); // Cleanup interval on unmount
-  }, []);
-
-  const unreadCount = notifications?.length > 0 ? notifications?.filter((n) => !n.read)?.length : 0;
-
-  const handleMarkAsRead = async (id: string) => {
-    setNotifications(
-      notifications?.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-    await updateNotification(id);
-    fetchNotifications();
-  };
-
-  const handleMarkAllAsRead = () => {
-    setNotifications(notifications?.map((n) => ({ ...n, read: true })));
-    notifications?.forEach(async (n) => {
-      await updateNotification(n.id);
-    });
-    fetchNotifications();
-  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -287,104 +235,8 @@ const Navigation = () => {
                   </button>
                 );
               })}
-              {
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon" className="relative">
-                      <Bell className="h-5 w-5" />
-                      {unreadCount > 0 && (
-                        <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
-                          {unreadCount}
-                        </span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-80 p-0" align="end">
-                    <div className="flex items-center justify-between p-3 border-b border-border bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                      <h3 className="font-medium">Notifications</h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs h-8"
-                        onClick={() => navigate("/notifications")}
-                      >
-                        View all
-                      </Button>
-                      {unreadCount > 0 && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-xs h-8"
-                          onClick={handleMarkAllAsRead}
-                        >
-                          Mark all as read
-                        </Button>
-                      )}
-                    </div>
-                    <div className="max-h-[300px] overflow-y-auto">
-                      {notifications?.length > 0 ? (
-                        <div className="divide-y divide-border">
-                          {notifications?.map((notification) => (
-                            <NotificationItem
-                              key={notification.id}
-                              notification={notification}
-                              onRead={handleMarkAsRead}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="p-4 text-center text-sm text-muted-foreground">
-                          No notifications yet
-                        </div>
-                      )}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              }
-              {
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="relative h-8 w-8 rounded-full focus:outline-none border-none"
-                    >
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={user?.avatar}
-                          alt={user?.firstName || ""}
-                        />
-                        <AvatarFallback>
-                          {user?.firstName?.charAt(0) +
-                            user?.lastName?.charAt(0) || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {user?.firstName + " " + user?.lastName}
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {user?.email}
-                        </p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate("/profile")}>
-                      Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate("/settings")}>
-                      Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignout}>
-                      Log out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              }
+              <NotificationMenu /> {/* Call NotificationMenu */}
+              <ProfileMenu user={user} onSignout={handleSignout} /> {/* Call ProfileMenu */}
             </div>
 
             {/* Mobile menu button */}
