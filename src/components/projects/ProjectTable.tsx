@@ -129,11 +129,9 @@ const ProjectTable = ({ projects, onEdit, onView, isViewMode }: ProjectTableProp
                 <TableCell>{format(new Date(project.poEndDate), "MMM d, yyyy")}</TableCell>
                 <TableCell>{project.status}</TableCell>
                 <TableCell>
-                  {!isViewMode && (
                     <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(project); }}>
                       <Edit className="h-4 w-4" />
                     </Button>
-                  )}
                 </TableCell>
               </TableRow>
             ))}
