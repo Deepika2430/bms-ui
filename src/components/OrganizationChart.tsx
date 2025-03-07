@@ -8,6 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getUserHierarchyByEmpId } from "@/services/orgChat"; // Import the service function
 
 interface Employee {
   id: string;
@@ -21,6 +22,7 @@ interface Employee {
 
 interface OrganizationChartProps {
   data: Employee;
+  onCardClick: (empId: string) => void; // Add onCardClick prop
 }
 
 const getInitials = (firstName: string, lastName: string) => {
@@ -39,9 +41,10 @@ const getDesignationInitials = (designation: string) => {
   }
 };
 
-const EmployeeNode: React.FC<{ employee: Employee; level?: number }> = ({
+const EmployeeNode: React.FC<{ employee: Employee; level?: number; onCardClick: (empId: string) => void }> = ({
   employee,
   level = 0,
+  onCardClick,
 }) => {
   return (
     <motion.div
@@ -50,7 +53,10 @@ const EmployeeNode: React.FC<{ employee: Employee; level?: number }> = ({
       transition={{ duration: 0.5, delay: level * 0.2 }}
       className="flex flex-col items-center"
     >
-      <Card className="p-2 bg-gradient-to-br from-purple-50 to-white border border-purple-300 shadow-xl hover:shadow-xl transition-all duration-300 w-60">
+      <Card
+        className="p-2 bg-gradient-to-br from-purple-50 to-white border border-purple-300 shadow-xl hover:shadow-xl transition-all duration-300 w-60 cursor-pointer"
+        onClick={() => onCardClick(employee.empId)} // Handle card click
+      >
         <div className="flex items-center gap-2">
           <Avatar className="h-10 w-10 ring-2 ring-purple-500/30 shadow-md">
             <AvatarFallback className="bg-gradient-to-br from-purple-500 to-purple-600 text-white font-medium text-sm">
@@ -84,9 +90,9 @@ const EmployeeNode: React.FC<{ employee: Employee; level?: number }> = ({
       {employee?.subordinates?.length > 0 && (
         <>
           <div className="w-px h-6 bg-gradient-to-b from-purple-200 to-purple-300"></div>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-row gap-4">
             {employee?.subordinates?.map((subordinate) => (
-              <EmployeeNode key={subordinate?.id} employee={subordinate} level={level + 1} />
+              <EmployeeNode key={subordinate?.id} employee={subordinate} level={level + 1} onCardClick={onCardClick} />
             ))}
           </div>
         </>
@@ -95,11 +101,11 @@ const EmployeeNode: React.FC<{ employee: Employee; level?: number }> = ({
   );
 };
 
-const OrganizationChart: React.FC<OrganizationChartProps> = ({ data }) => {
+const OrganizationChart: React.FC<OrganizationChartProps> = ({ data, onCardClick }) => {
   return (
     <div className="w-full max-w-4xl mx-auto p-8">
       <TooltipProvider>
-        <EmployeeNode employee={data} />
+        <EmployeeNode employee={data} onCardClick={onCardClick} />
       </TooltipProvider>
     </div>
   );

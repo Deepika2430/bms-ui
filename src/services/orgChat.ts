@@ -20,10 +20,10 @@ export const getUserHierarchy = async () => {
     }
 };
 
-export const getOrgChart = async (userId: string) => {
+export const getUserHierarchyByEmpId = async (empId: string) => {
     const token = await getToken();
     try {
-        const response = await fetch(`${config.apiBaseUrl}/user/org-chart?user_id=${userId}`, {
+        const response = await fetch(`${config.apiBaseUrl}/user/org-chart?emp_id=${empId}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
