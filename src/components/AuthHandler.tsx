@@ -12,7 +12,7 @@ import Profile from "../pages/Profile";
 import AuthForm from "../components/AuthForm";
 import NotFound from "../pages/NotFound";
 import { getToken, getRole } from "../services/authService";
-import NotificationsHistory from "./NotificationHistory";
+import NotificationsHistory from "./notifications/NotificationHistory";
 import MyTimesheet from "./timesheet/MyTimesheet";
 import ManageTeamTimesheet from "./timesheet/ManageTeamTimesheet";
 import OrganizationChart from "../pages/OrganizationChart";
@@ -21,6 +21,7 @@ import Analytics from "@/components/dashboard/Analytics";
 import Users from "@/components/dashboard/Users";
 import ThemeSettings from "@/components/dashboard/Settings";
 import Dashboard from "@/components/dashboard/Dashboard";
+import ConsultantDashboard from "@/components/consultant/Dashboard";
 
 const AuthHandler = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!getToken());
@@ -65,9 +66,16 @@ const AuthHandler = () => {
       {isAuthenticated ? (
         <Route path="/" element={<Layout />}>
           <Route path="home" element={<HomeLayout />}>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="users" element={<Users />} />
+            {role === "consultant" && (
+              <Route path="dashboard" element={<ConsultantDashboard />} />
+            )}
+            {role === "admin" && (
+            <>
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="users" element={<Users />} />
+            </>
+            )}
             <Route path="settings" element={<ThemeSettings />} />
           </Route>
           <Route path="profile" element={<Profile />} />

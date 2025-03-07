@@ -24,7 +24,13 @@ const HomeLayout: React.FC = () => {
       name: "Dashboard",
       icon: <LayoutDashboard size={20} />,
       path: "/home/dashboard",
-      allowedRoles: ["admin", "manager", "consultant", "associate-consultant"],
+      allowedRoles: ["admin",],
+    },
+    {
+      name: "Dashboard",
+      icon: <LayoutDashboard size={20} />,
+      path: "/home/dashboard",
+      allowedRoles: ["manager", "consultant", "associate-consultant"],
     },
     {
       name: "Analytics",
@@ -36,7 +42,7 @@ const HomeLayout: React.FC = () => {
       name: "Users",
       icon: <UsersIcon size={20} />,
       path: "/home/users",
-      allowedRoles: ["admin", "manager"],
+      allowedRoles: ["admin",],
     },
     {
       name: "Appearance",
