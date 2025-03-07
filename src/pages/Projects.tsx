@@ -86,7 +86,7 @@ const Projects = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ProjectTable projects={projects} onEdit={handleEdit} onView={handleView} />
+            <ProjectTable projects={projects} onEdit={handleEdit} onView={handleView} isViewMode={!!viewingProject} />
           </CardContent>
         </Card>
 

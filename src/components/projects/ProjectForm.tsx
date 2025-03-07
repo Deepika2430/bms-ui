@@ -77,9 +77,10 @@ interface ProjectFormProps {
   onSubmit: (data: z.infer<typeof projectSchema>) => void;
   onCancel: () => void;
   initialData?: any;
+  isViewMode: boolean;
 }
 
-const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
+const ProjectForm = ({ onSubmit, onCancel, initialData, isViewMode }: ProjectFormProps) => {
   const [documents, setDocuments] = useState<string[]>([]);
   const [isProjectInfoOpen, setIsProjectInfoOpen] = useState(true);
   const [isAssignPmOpen, setIsAssignPmOpen] = useState(true);
@@ -214,6 +215,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
+                            disabled={isViewMode}
                           >
                             <FormControl>
                               <SelectTrigger>
@@ -240,7 +242,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                         <FormItem>
                           <FormLabel>Project Code*</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -254,7 +256,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                         <FormItem>
                           <FormLabel>Project Name*</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -268,7 +270,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                         <FormItem>
                           <FormLabel>Project Description*</FormLabel>
                           <FormControl>
-                            <Textarea className="w-[300px]" {...field} />
+                            <Textarea className="w-[300px]" {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -286,6 +288,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                               type="date"
                               className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               {...field}
+                              disabled={isViewMode}
                             />
                           </FormControl>
                           <FormMessage />
@@ -304,6 +307,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                               type="date"
                               className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               {...field}
+                              disabled={isViewMode}
                             />
                           </FormControl>
                           <FormMessage />
@@ -322,6 +326,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                               type="date"
                               className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               {...field}
+                              disabled={isViewMode}
                             />
                           </FormControl>
                           <FormMessage />
@@ -340,6 +345,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                               type="date"
                               className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               {...field}
+                              disabled={isViewMode}
                             />
                           </FormControl>
                           <FormMessage />
@@ -358,6 +364,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                               type="date"
                               className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               {...field}
+                              disabled={isViewMode}
                             />
                           </FormControl>
                           <FormMessage />
@@ -372,7 +379,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                         <FormItem>
                           <FormLabel>Contracted Efforts (Hrs)</FormLabel>
                           <FormControl>
-                            <Input {...field} type="number" />
+                            <Input {...field} type="number" disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -386,7 +393,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                         <FormItem>
                           <FormLabel>Planned Efforts (Hrs)</FormLabel>
                           <FormControl>
-                            <Input {...field} type="number" />
+                            <Input {...field} type="number" disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -400,7 +407,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                         <FormItem>
                           <FormLabel>PO#</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -417,6 +424,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                             <Select
                               onValueChange={field.onChange}
                               defaultValue={field.value}
+                              disabled={isViewMode}
                             >
                               <FormControl>
                                 <SelectTrigger className="w-[100px]">
@@ -445,6 +453,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                 className="w-30"
                                 {...field}
                                 type="number"
+                                disabled={isViewMode}
                               />
                             </FormControl>
                           )}
@@ -463,6 +472,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                               type="date" 
                               className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               {...field} 
+                              disabled={isViewMode}
                             />
                           </FormControl>
                           <FormMessage />
@@ -481,6 +491,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                               type="date" 
                               className="w-[300px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                               {...field} 
+                              disabled={isViewMode}
                             />
                           </FormControl>
                           <FormMessage />
@@ -495,7 +506,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                         <FormItem>
                           <FormLabel>PO Validity</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -509,7 +520,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                         <FormItem>
                           <FormLabel>PO Upliftment Details</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -523,7 +534,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                         <FormItem>
                           <FormLabel>Comments</FormLabel>
                           <FormControl>
-                            <Textarea className="w-[300px]" {...field} />
+                            <Textarea className="w-[300px]" {...field} disabled={isViewMode} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -541,6 +552,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                               onValueChange={field.onChange}
                               defaultValue={field.value}
                               className="flex flex-row space-x-4"
+                              disabled={isViewMode}
                             >
                               <FormItem className="flex items-center space-x-2 space-y-0">
                                 <FormControl>
@@ -590,6 +602,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
+                            disabled={isViewMode}
                           >
                             <FormControl>
                               <SelectTrigger>
@@ -617,6 +630,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
+                            disabled={isViewMode}
                           >
                             <FormControl>
                               <SelectTrigger>
@@ -651,7 +665,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                           <FormItem>
                             <FormLabel>First Name</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} disabled={isViewMode} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -664,7 +678,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                           <FormItem>
                             <FormLabel>Last Name</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} disabled={isViewMode} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -677,7 +691,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                           <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                              <Input {...field} type="email" />
+                              <Input {...field} type="email" disabled={isViewMode} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -690,7 +704,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                           <FormItem>
                             <FormLabel>Mobile</FormLabel>
                             <FormControl>
-                              <Input {...field} type="tel" />
+                              <Input {...field} type="tel" disabled={isViewMode} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -703,7 +717,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                           <FormItem>
                             <FormLabel>Phone</FormLabel>
                             <FormControl>
-                              <Input {...field} type="tel" />
+                              <Input {...field} type="tel" disabled={isViewMode} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -719,11 +733,13 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                           type="file"
                           onChange={handleFileUpload}
                           className="max-w-xs pb-8"
+                          disabled={isViewMode}
                         />
                         <Button
                           type="button"
                           variant="outline"
                           onClick={() => setDocuments([...documents])}
+                          disabled={isViewMode}
                         >
                           Add
                         </Button>
@@ -741,6 +757,7 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleRemoveDocument(index)}
+                                disabled={isViewMode}
                               >
                                 Remove
                               </Button>
@@ -754,16 +771,20 @@ const ProjectForm = ({ onSubmit, onCancel, initialData }: ProjectFormProps) => {
               )}
             </div>
             <div className="flex justify-end space-x-4 p-4">
-              <Button type="button" variant="outline" onClick={onCancel}>
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="bg-nav-accent text-white"
-                onClick={form.handleSubmit(handleSubmit)}
-              >
-                {initialData ? "Update Project" : "Create Project"}
-              </Button>
+              {!isViewMode && (
+                <>
+                  <Button type="button" variant="outline" onClick={onCancel}>
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-nav-accent text-white"
+                    onClick={form.handleSubmit(handleSubmit)}
+                  >
+                    {initialData ? "Update Project" : "Create Project"}
+                  </Button>
+                </>
+              )}
             </div>
           </form>
         </Form>
