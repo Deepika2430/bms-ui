@@ -10,6 +10,9 @@ import { toast } from "react-toastify";
 import { getUserDetails } from "@/services/userService";
 import { getProjects } from "@/services/projectService";
 import { getAssignedTasks, getTasks } from "@/services/taskService";
+import { getWorkLogs } from "@/services/workLogsService";
+import { startOfWeek, endOfWeek, eachDayOfInterval, format, subWeeks, subMonths, startOfMonth, endOfMonth, eachWeekOfInterval } from "date-fns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -19,6 +22,8 @@ const Dashboard = () => {
   const [role, setRole] = useState(null);
   const [projects, setProjects] = useState([]);
   const [allTasks, setAllTasks] = useState([]);
+  const [workLog, setWorkLog] = useState([]);
+  const [timeFilter, setTimeFilter] = useState("currentWeek");
 
   const fetchTasks = async () => {
     try {
@@ -41,6 +46,16 @@ const Dashboard = () => {
     }
   };
 
+  const fetchWorkLogs = async () => {
+    try {
+      const workLogData = await getWorkLogs();
+      console.log(workLogData);
+      setWorkLog(workLogData);
+    } catch (error) {
+      console.error("Error fetching work logs:", error);
+    }
+  }
+
   const fetchProjects = async () => {
     try {
       const response = await getProjects();
@@ -57,12 +72,10 @@ const Dashboard = () => {
       tasksCompleted: tasks.filter((t) => t.status === "completed").length,
       tasksInProgress: tasks.filter((t) => t.status === "in_progress").length,
       tasksPending: tasks.filter((t) => t.status === "open").length,
-      hoursLogged: 40,
-      timeAllocations: projects.map((project) => ({
-        projectId: project.id,
-        projectName: project.projectName,
-        hours: tasks.filter((task) => task.projectId === project.id).reduce((sum, task) => sum + parseInt(task.estimatedHours, 10), 0),
-        percentage: 0, // This can be calculated if needed
+      hoursLogged: workLog.reduce((sum, log) => sum + parseInt(log.hours_worked, 10), 0),
+      timeAllocations: tasks.map((task) => ({
+        taskId: task.id,
+        taskName: task?.taskTitle,
       })),
     };
   };
@@ -80,7 +93,8 @@ const Dashboard = () => {
   useEffect(() => {
     fetchUser();
     fetchTasks();
-    fetchAllTasks();
+    if (role === "manager") fetchAllTasks();
+    fetchWorkLogs();
   }, []);
 
   useEffect(() => {
@@ -91,7 +105,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     setMetrics(getMetrics());
-  }, [tasks, projects]);
+  }, [tasks, projects, workLog]);
 
   // Prepare chart data
   const pieChartData = role === "manager"
@@ -122,36 +136,44 @@ const Dashboard = () => {
         },
       ];
 
-  const barChartData = [
-    {
-      name: "Mon",
-      hours: 8,
-    },
-    {
-      name: "Tue",
-      hours: 10,
-    },
-    {
-      name: "Wed",
-      hours: 7,
-    },
-    {
-      name: "Thu",
-      hours: 9,
-    },
-    {
-      name: "Fri",
-      hours: 6,
-    },
-    {
-      name: "Sat",
-      hours: 0,
-    },
-    {
-      name: "Sun",
-      hours: 0,
-    },
-  ];
+  const getBarChartData = () => {
+    let startDate, endDate;
+    if (timeFilter === "currentWeek") {
+      startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
+      endDate = endOfWeek(new Date(), { weekStartsOn: 1 });
+    } else if (timeFilter === "previousWeek") {
+      startDate = startOfWeek(subWeeks(new Date(), 1), { weekStartsOn: 1 });
+      endDate = endOfWeek(subWeeks(new Date(), 1), { weekStartsOn: 1 });
+    } else if (timeFilter === "currentMonth") {
+      startDate = startOfMonth(new Date());
+      endDate = endOfMonth(new Date());
+    } else if (timeFilter === "previousMonth") {
+      startDate = startOfMonth(subMonths(new Date(), 1));
+      endDate = endOfMonth(subMonths(new Date(), 1));
+    }
+
+    if (timeFilter === "currentMonth" || timeFilter === "previousMonth") {
+      const weeks = eachWeekOfInterval({ start: startDate, end: endDate }, { weekStartsOn: 1 });
+      return weeks.map((weekStart) => {
+        const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+        const weekLogs = workLog.filter((log) => new Date(log.work_date) >= weekStart && new Date(log.work_date) <= weekEnd);
+        const weekHours = weekLogs.reduce((sum, log) => sum + parseInt(log.hours_worked, 10), 0);
+        const dayCount = weekLogs.length;
+        return { name: `Week of ${format(weekStart, "MMM d")}`, hours: weekHours, dayCount };
+      });
+    } else {
+      const interval = eachDayOfInterval({ start: startDate, end: endDate });
+      return interval.map((date) => {
+        const day = format(date, "EEE");
+        const hours = workLog
+          .filter((log) => format(new Date(log.work_date), "yyyy-MM-dd") === format(date, "yyyy-MM-dd"))
+          .reduce((sum, log) => sum + parseInt(log.hours_worked, 10), 0);
+        return { name: day, hours };
+      });
+    }
+  };
+
+  const barChartData = getBarChartData();
 
   // Helper function to get random color based on ID
   function getRandomColor(id: string) {
@@ -205,6 +227,17 @@ const Dashboard = () => {
         <div className="bg-white dark:bg-card rounded-lg shadow-sm border border-border p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-medium">Hours Logged</h2>
+            <Select onValueChange={setTimeFilter} defaultValue={timeFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Select Time Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="currentWeek">Current Week</SelectItem>
+                <SelectItem value="previousWeek">Previous Week</SelectItem>
+                <SelectItem value="currentMonth">Current Month</SelectItem>
+                <SelectItem value="previousMonth">Previous Month</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <BarChart
             data={barChartData}
@@ -216,6 +249,12 @@ const Dashboard = () => {
               },
             ]}
             className="h-48"
+            tooltipFormatter={(value, name, props) => {
+              if (timeFilter === "currentMonth" || timeFilter === "previousMonth") {
+                return `${value} hours over ${props.payload.dayCount} days`;
+              }
+              return `${value} hours`;
+            }}
           />
         </div>
       </div>

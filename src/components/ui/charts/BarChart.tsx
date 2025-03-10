@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   BarChart as RechartsBarChart,
@@ -24,9 +23,10 @@ interface BarChartProps {
   xAxisLabel?: string;
   yAxisLabel?: string;
   className?: string;
+  tooltipFormatter?: (value: any, name: string, props: any) => string; // Add tooltipFormatter prop
 }
 
-const BarChart = ({ data, bars, xAxisLabel, yAxisLabel, className }: BarChartProps) => {
+const BarChart = ({ data, bars, xAxisLabel, yAxisLabel, className, tooltipFormatter }: BarChartProps) => {
   return (
     <div className={className} style={{ width: '100%', height: '100%', minHeight: '300px' }}>
       <ResponsiveContainer width="100%" height={300}>
@@ -60,6 +60,7 @@ const BarChart = ({ data, bars, xAxisLabel, yAxisLabel, className }: BarChartPro
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
               border: 'none' 
             }} 
+            formatter={tooltipFormatter} // Use the custom tooltip formatter
           />
           <Legend 
             verticalAlign="top" 
