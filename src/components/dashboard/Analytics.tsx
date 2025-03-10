@@ -101,7 +101,7 @@ const Analytics = () => {
   return (
     <div className="relative space-y-6 page-transition overflow-hidden">
       {/* Inner Header Positioned Relatively */}
-      <div className="fixed top-16 left-64 right-0 bg-white dark:bg-card shadow-sm border-b border-border z-20 p-1 mx-3.5">
+      <div className="fixed top-16 pt-6 left-64 right-0 bg-white dark:bg-card shadow-sm border-b border-border z-20 p-1 mx-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="font-semibold">Analytics</h1>
