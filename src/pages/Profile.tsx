@@ -11,6 +11,11 @@ import {
   Building,
   Award,
   Hash,
+  MapPin,
+  Home,
+  Heart,
+  UserCheck,
+  UserX,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -44,6 +49,7 @@ const EmployeeProfile: React.FC = () => {
     };
     fetchEmployee();
   }, []);
+
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), "PPP");
@@ -70,7 +76,7 @@ const EmployeeProfile: React.FC = () => {
   return loading ? (
     <div>Loading...</div>
   ) : (
-    <div className="min-h-screen pt-32 px-4 bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen pt-20 px-4 bg-gray-50 dark:bg-gray-900">
       <Card className="w-full max-w-4xl  mx-auto overflow-hidden shadow-lg ">
         <CardHeader className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
           <div className="flex items-start justify-between">
@@ -119,7 +125,7 @@ const EmployeeProfile: React.FC = () => {
                   <Phone className="h-5 w-5 text-gray-500 mt-0.5 mr-3" />
                   <div>
                     <p className="text-sm text-gray-500">Mobile</p>
-                    <p className="text-gray-700">{employee.mobile}</p>
+                    <p className="text-gray-700">{employee?.mobile}</p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -127,8 +133,29 @@ const EmployeeProfile: React.FC = () => {
                   <div>
                     <p className="text-sm text-gray-500">Date of Birth</p>
                     <p className="text-gray-700">
-                      {formatDate(employee.dateOfBirth)}
+                      {formatDate(employee?.dateOfBirth)}
                     </p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <Heart className="h-5 w-5 text-gray-500 mt-0.5 mr-3" />
+                  <div>
+                    <p className="text-sm text-gray-500">Blood Group</p>
+                    <p className="text-gray-700">{employee?.bloodGroup}</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <UserCheck className="h-5 w-5 text-gray-500 mt-0.5 mr-3" />
+                  <div>
+                    <p className="text-sm text-gray-500">Gender</p>
+                    <p className="text-gray-700">{employee?.gender}</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <MapPin className="h-5 w-5 text-gray-500 mt-0.5 mr-3" />
+                  <div>
+                    <p className="text-sm text-gray-500">Address</p>
+                    <p className="text-gray-700">{employee?.currentAddress}</p>
                   </div>
                 </div>
               </div>
@@ -142,7 +169,7 @@ const EmployeeProfile: React.FC = () => {
                 About
               </h3>
               <p className="text-gray-700 whitespace-pre-line">
-                {employee?.description || "No description available."}
+                {employee?.otherDetails || "No description available."}
               </p>
             </div>
           </div>
@@ -173,7 +200,7 @@ const EmployeeProfile: React.FC = () => {
                   <div>
                     <p className="text-sm text-gray-500">Department</p>
                     <p className="text-gray-700">
-                      {employee?.department ?? employee?.departmentId ?? ""}
+                      {employee?.department}
                     </p>
                   </div>
                 </div>
@@ -183,6 +210,33 @@ const EmployeeProfile: React.FC = () => {
                     <p className="text-sm text-gray-500">Date of Joining</p>
                     <p className="text-gray-700">
                       {formatDate(employee?.dateOfJoining)}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <Calendar className="h-5 w-5 text-gray-500 mt-0.5 mr-3" />
+                  <div>
+                    <p className="text-sm text-gray-500">Contract End Date</p>
+                    <p className="text-gray-700">
+                      {formatDate(employee?.contractEndDate)}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <UserX className="h-5 w-5 text-gray-500 mt-0.5 mr-3" />
+                  <div>
+                    <p className="text-sm text-gray-500">Resignation Date</p>
+                    <p className="text-gray-700">
+                      {employee?.resignation_date ? formatDate(employee?.resignationDate) : "N/A"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <UserX className="h-5 w-5 text-gray-500 mt-0.5 mr-3" />
+                  <div>
+                    <p className="text-sm text-gray-500">Last Working Date</p>
+                    <p className="text-gray-700">
+                      {employee?.lastWorkingDate ? formatDate(employee?.lastWorkingDate) : "N/A"}
                     </p>
                   </div>
                 </div>
@@ -200,18 +254,18 @@ const EmployeeProfile: React.FC = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-500">Created</span>
                   <span className="text-gray-700">
-                    {formatDate(employee.createdAt)}
+                    {formatDate(employee?.createdAt)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Last Updated</span>
                   <span className="text-gray-700">
-                    {formatDate(employee.updatedAt)}
+                    {formatDate(employee?.updatedAt)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">User ID</span>
-                  <span className="text-gray-700">{employee.id}</span>
+                  <span className="text-gray-700">{employee?.id}</span>
                 </div>
               </div>
             </div>
@@ -221,7 +275,7 @@ const EmployeeProfile: React.FC = () => {
         <CardFooter className="bg-gray-50 border-t px-6 py-4">
           <div className="flex items-center text-sm text-gray-500">
             <Clock className="mr-2 h-4 w-4" />
-            <span>Profile ID: {employee.id}</span>
+            <span>Profile ID: {employee?.id}</span>
           </div>
         </CardFooter>
       </Card>

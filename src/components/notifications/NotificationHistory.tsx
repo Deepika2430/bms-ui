@@ -91,12 +91,12 @@ const NotificationsHistory: React.FC = () => {
   const unreadCount = notifications.filter(n => n.read === false).length;
 
   return (
-    <div className="w-full pt-14 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+    <div className="max-w-4xl mx-auto mt-20 dark:bg-gray-800 rounded-lg border overflow-hidden">
       {/* <div className="px-4 py-4 flex items-center justify-between bg-gradient-to-r from-blue-500 to-purple-500 text-white"> */}
-      <div className="px-4 py-4 flex items-center justify-between bg-nav-accent text-white">
-        <div className="flex items-center gap-2">
+      <div className="px-4 py-4 flex items-center justify-between bg-nav-accent text-white ">
+        <div className="flex items-center gap-2 ">
           <Bell className="h-5 w-5" />
-          <h2 className="font-semibold text-lg">Notifications</h2>
+          <h2 className="font-semibold text-2xl">Notifications</h2>
           {unreadCount > 0 && (
             <span className="bg-red-500 text-white text-xs font-medium rounded-full px-2 py-0.5">
               {unreadCount}
@@ -116,7 +116,7 @@ const NotificationsHistory: React.FC = () => {
       </div>
 
       <Tabs defaultValue="all" className="w-full" onValueChange={(value) => setActiveTab(value as 'all' | 'unread')}>
-        <div className="px-4">
+        <div className="px-0">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="all" className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-500">
               All
