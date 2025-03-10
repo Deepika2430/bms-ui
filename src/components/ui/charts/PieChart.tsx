@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   PieChart as RechartsPieChart,
@@ -14,8 +13,10 @@ interface PieChartProps {
     name: string;
     value: number;
     color: string;
+    tooltip?: string;
   }>;
   className?: string;
+  tooltipKey?: string; // Add tooltipKey prop
 }
 
 const RADIAN = Math.PI / 180;
@@ -46,7 +47,7 @@ const renderCustomizedLabel = ({
   );
 };
 
-const PieChart = ({ data, className }: PieChartProps) => {
+const PieChart = ({ data, className, tooltipKey }: PieChartProps) => {
   return (
     <div className={className} style={{ width: '100%', height: '100%', minHeight: '300px' }}>
       <ResponsiveContainer width="100%" height={300}>
@@ -78,7 +79,9 @@ const PieChart = ({ data, className }: PieChartProps) => {
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
               border: 'none' 
             }} 
-            formatter={(value: number) => [`${value} hours`, 'Time Spent']}
+            formatter={(value, name, props) => {
+              return tooltipKey ? props.payload[tooltipKey] : value;
+            }}
           />
           <Legend 
             layout="horizontal"
